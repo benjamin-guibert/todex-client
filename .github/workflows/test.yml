@@ -65,4 +65,4 @@ jobs:
         run: yarn install --non-interactive
 
       - name: Run tests
-        run: react-scripts test
+        run: yarn react-scripts test
