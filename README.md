@@ -20,9 +20,10 @@ This project require the following dependencies:
 
 ### Setup
 
-Install the dependencies:
+Install the dependencies and the `.env` file (set the contract addresses):
 
 ```bash
+cp .env.sample .env
 yarn install
 ```
 
@@ -59,7 +60,12 @@ This project is not currently open to contributions.
 , [Eslint](https://eslint.org)
 , [Prettier](https://prettier.io)
 , [Jest](https://jestjs.io)
-, [Enzyme](https://enzymejs.github.io)
+, [styled-components](https://styled-components.com)
+, [Ethers](https://docs.ethers.io/)
+, [metamask/detect-provider](https://github.com/MetaMask/detect-provider)
+, [Numeral.js](http://numeraljs.com)
+, [Bootstrap](https://getbootstrap.com)
+, [React Bootstrap](https://react-bootstrap.github.io)
 
 ## Release History
 
