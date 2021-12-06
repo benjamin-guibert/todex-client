@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<App /> should render 1`] = `
+<div>
+  <nav
+    className="sc-bdvvtL dkPJRw navbar navbar-expand navbar-dark bg-dark"
+  >
+    <div
+      className="container-fluid"
+    >
+      <span
+        className="navbar-brand"
+      >
+        ToDEX
+      </span>
+    </div>
+  </nav>
+  <div
+    className="bg-dark text-light container-fluid"
+  >
+    <div
+      className="row"
+    >
+      <div
+        className="col"
+      >
+        <div
+          className="row"
+        />
+        <div
+          className="row"
+        />
+      </div>
+      <div
+        className="col"
+      />
+      <div
+        className="col"
+      >
+        <div
+          className="row"
+        />
+        <div
+          className="row"
+        />
+      </div>
+      <div
+        className="col"
+      />
+    </div>
+  </div>
+  <div
+    className="fade modal-backdrop"
+    onClick={[Function]}
+  />
+  <div
+    aria-modal={true}
+    className="fade modal"
+    onClick={[Function]}
+    onMouseUp={[Function]}
+    role="dialog"
+    style={Object {}}
+    tabIndex={-1}
+  >
+    <div
+      className="modal-dialog modal-sm modal-dialog-centered"
+      onMouseDown={[Function]}
+    >
+      <div
+        className="modal-content"
+      >
+        <div
+          className="modal-header"
+        >
+          <div
+            className="modal-title h4"
+          >
+            MetaMask
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

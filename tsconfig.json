@@ -5,5 +5,5 @@
     "removeComments": true
   },
   "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.*", "src/**/tests", "src/**/__mocks__/*"]
+  "exclude": ["src/**/*.test.*", "src/test", "src/**/__mocks__/*"]
 }

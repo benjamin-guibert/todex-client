@@ -34,7 +34,9 @@ jobs:
         run: yarn install --non-interactive
 
       - name: Run Lint
-        run: yarn eslint --max-warnings 0 --ext js,jsx,ts,tsx,md,mdx .
+        run: |
+          yarn eslint --max-warnings 0 --ext js,jsx,ts,tsx,md,mdx .
+          yarn prettier --list-different .
 
   test:
     name: Test the code
@@ -65,4 +67,4 @@ jobs:
         run: yarn install --non-interactive
 
       - name: Run tests
-        run: yarn react-scripts test
+        run: yarn react-scripts test --watchAll=false --coverage

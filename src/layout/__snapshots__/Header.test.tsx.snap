@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Header /> should render when MetaMask initialized 1`] = `
+<nav
+  className="sc-bdvvtL dkPJRw navbar navbar-expand navbar-dark bg-dark"
+>
+  <div
+    className="container-fluid"
+  >
+    <span
+      className="navbar-brand"
+    >
+      ToDEX
+    </span>
+    <span
+      className="navbar-text"
+    >
+      Ξ 10.5
+    </span>
+    <span
+      className="navbar-text"
+    >
+      ToDEX 1,000.5
+    </span>
+    <button
+      className="btn btn-primary"
+      disabled={false}
+      onClick={[MockFunction]}
+      type="button"
+    >
+      Connect Wallet
+    </button>
+  </div>
+</nav>
+`;
+
+exports[`<Header /> should render when MetaMask not initialized 1`] = `
+<nav
+  className="sc-bdvvtL dkPJRw navbar navbar-expand navbar-dark bg-dark"
+>
+  <div
+    className="container-fluid"
+  >
+    <span
+      className="navbar-brand"
+    >
+      ToDEX
+    </span>
+  </div>
+</nav>
+`;
+
+exports[`<Header /> should render when no account connected 1`] = `
+<nav
+  className="sc-bdvvtL dkPJRw navbar navbar-expand navbar-dark bg-dark"
+>
+  <div
+    className="container-fluid"
+  >
+    <span
+      className="navbar-brand"
+    >
+      ToDEX
+    </span>
+    <button
+      className="btn btn-primary"
+      disabled={false}
+      onClick={[MockFunction]}
+      type="button"
+    >
+      Connect Wallet
+    </button>
+  </div>
+</nav>
+`;
