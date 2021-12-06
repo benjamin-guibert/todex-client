@@ -2,3 +2,5 @@
 /tmp
 /types
 /dist
+/coverage
+/src/contracts
