@@ -28,7 +28,7 @@ export const initializeContract = (provider: Web3Provider, token: Token): Exchan
 export const getEthBalance = async (handler: ExchangeHandler, account: string): Promise<BigNumber | undefined> => {
   try {
     return (await handler.exchange?.ethBalanceOf(account)) as BigNumber
-  } catch (error) {
+  } catch {
     return
   }
 }
