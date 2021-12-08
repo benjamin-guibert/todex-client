@@ -63,7 +63,9 @@ This project is not currently open to contributions.
 , [styled-components](https://styled-components.com)
 , [Ethers](https://docs.ethers.io/)
 , [metamask/detect-provider](https://github.com/MetaMask/detect-provider)
+, [Lodash](https://lodash.com)
 , [Numeral.js](http://numeraljs.com)
+, [Moment.js](https://momentjs.com)
 , [Bootstrap](https://getbootstrap.com)
 , [React Bootstrap](https://react-bootstrap.github.io)
 

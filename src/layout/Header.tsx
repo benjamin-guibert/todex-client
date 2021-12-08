@@ -17,13 +17,13 @@ const Header: FC = () => {
   const { ethBalance, tokenBalance } = useContext(ExchangeContext)
 
   return (
-    <StyledHeader bg="dark" variant="dark">
+    <StyledHeader bg="light" variant="light">
       <Container fluid>
         <Navbar.Brand>ToDEX</Navbar.Brand>
         {initializationStatus == InitializationStatus.Initialized && (
           <>
             {!!ethBalance && <Navbar.Text>{`${ethers.constants.EtherSymbol} ${printBalance(ethBalance)}`}</Navbar.Text>}
-            {!!tokenBalance && <Navbar.Text>{`ToDEX ${printBalance(tokenBalance)}`}</Navbar.Text>}
+            {!!tokenBalance && <Navbar.Text>{`TDX ${printBalance(tokenBalance)}`}</Navbar.Text>}
             {!!account && <Navbar.Text>{shortenAddress(account)}</Navbar.Text>}
             {!account && <Button onClick={connect}>Connect Wallet</Button>}
           </>

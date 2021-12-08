@@ -5,13 +5,13 @@ import { Token as TokenType } from 'contracts/Token'
 
 export interface TokenHandler {
   provider: Web3Provider
-  token: TokenType | undefined
+  token: TokenType
 }
 
-export const initializeContract = (provider: Web3Provider): TokenHandler | undefined => {
+export const initializeContract = (provider: Web3Provider): TokenHandler => {
   const tokenAddress = process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS
   if (!tokenAddress) {
-    return
+    throw new Error('Token address missing')
   }
 
   const token = new ethers.Contract(tokenAddress, Token.abi, provider.getSigner()) as TokenType

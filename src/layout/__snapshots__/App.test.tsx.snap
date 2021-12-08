@@ -1,9 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<App /> should render 1`] = `
-<div>
+exports[`<App /> should render when not initialized 1`] = `
+<div
+  className="sc-hKwDye VuQbL bg-dark text-light"
+>
   <nav
-    className="sc-bdvvtL dkPJRw navbar navbar-expand navbar-dark bg-dark"
+    className="sc-bdvvtL dqBChi navbar navbar-expand navbar-light bg-light"
   >
     <div
       className="container-fluid"
@@ -16,39 +18,8 @@ exports[`<App /> should render 1`] = `
     </div>
   </nav>
   <div
-    className="bg-dark text-light container-fluid"
-  >
-    <div
-      className="row"
-    >
-      <div
-        className="col"
-      >
-        <div
-          className="row"
-        />
-        <div
-          className="row"
-        />
-      </div>
-      <div
-        className="col"
-      />
-      <div
-        className="col"
-      >
-        <div
-          className="row"
-        />
-        <div
-          className="row"
-        />
-      </div>
-      <div
-        className="col"
-      />
-    </div>
-  </div>
+    className="sc-dkPtRN gQNRET container-fluid"
+  />
   <div
     className="fade modal-backdrop"
     onClick={[Function]}

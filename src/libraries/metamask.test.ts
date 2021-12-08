@@ -7,12 +7,13 @@ import { connect, getAccount, getBalance, initialize } from './metamask'
 jest.mock('@metamask/detect-provider')
 const detectEthereumProviderMock = mocked(detectEthereumProvider)
 const sendMock = jest.fn()
-const listAccountsMock = jest.fn()
+const getAddressMock = jest.fn()
+const getSignerMock = jest.fn()
 const getBalanceMock = jest.fn()
 const handler = {
   provider: {
     send: sendMock,
-    listAccounts: listAccountsMock,
+    getSigner: getSignerMock,
     getBalance: getBalanceMock,
   } as unknown as Web3Provider,
 }
@@ -40,10 +41,10 @@ describe('initialize()', () => {
     expect(detectEthereumProviderMock).toBeCalledTimes(1)
   })
 
-  it('should fail when error', () => {
+  it('should reject when error', () => {
     detectEthereumProviderMock.mockRejectedValueOnce('error')
 
-    expect(() => initialize()).rejects.toBe('error')
+    expect(initialize()).rejects.toBe('error')
 
     expect(detectEthereumProviderMock).toBeCalledTimes(1)
   })
@@ -53,24 +54,28 @@ describe('connect()', () => {
   const account = '0x0'
 
   it('should return account when success', async () => {
-    listAccountsMock.mockResolvedValueOnce([account, '0x1'])
+    getSignerMock.mockReturnValue({
+      getAddress: getAddressMock,
+    })
+    getAddressMock.mockResolvedValueOnce(account)
 
     const result = await connect(handler)
 
     expect(result).toBe(account)
     expect(sendMock).toBeCalledTimes(1)
-    expect(listAccountsMock).toBeCalledTimes(1)
+    expect(sendMock.mock.calls[0][0]).toBe('eth_requestAccounts')
+    expect(getSignerMock).toBeCalledTimes(1)
   })
 
-  it('should return nothing when failure', async () => {
+  it('should reject when error', async () => {
     sendMock.mockRejectedValue('error')
-    listAccountsMock.mockResolvedValueOnce([account, '0x1'])
+    getSignerMock.mockReturnValue({ getAddress: getAddressMock })
 
-    const result = await connect(handler)
+    expect(connect(handler)).rejects.toBe('error')
 
-    expect(result).toBeUndefined()
     expect(sendMock).toBeCalledTimes(1)
-    expect(listAccountsMock).toBeCalledTimes(0)
+    expect(sendMock.mock.calls[0][0]).toBe('eth_requestAccounts')
+    expect(getSignerMock).toBeCalledTimes(0)
   })
 })
 
@@ -78,21 +83,27 @@ describe('getAccount()', () => {
   const account = '0x0'
 
   it('should return account when success', async () => {
-    listAccountsMock.mockResolvedValueOnce([account, '0x1'])
+    getSignerMock.mockReturnValue({
+      getAddress: getAddressMock,
+    })
+    getAddressMock.mockResolvedValueOnce(account)
 
     const result = await getAccount(handler)
 
     expect(result).toBe(account)
-    expect(listAccountsMock).toBeCalledTimes(1)
+    expect(getAddressMock).toBeCalledTimes(1)
   })
 
-  it('should return nothing when failure', async () => {
-    listAccountsMock.mockRejectedValue('error')
+  it('should return nothing when not connected', async () => {
+    getSignerMock.mockReturnValue({
+      getAddress: getAddressMock,
+    })
+    getAddressMock.mockRejectedValue('error')
 
     const result = await getAccount(handler)
 
-    expect(result).toBeUndefined()
-    expect(listAccountsMock).toBeCalledTimes(1)
+    expect(result).toBeNull()
+    expect(getAddressMock).toBeCalledTimes(1)
   })
 })
 
@@ -110,12 +121,11 @@ describe('getBalance()', () => {
     expect(getBalanceMock.mock.calls[0][0]).toBe(account)
   })
 
-  it('should return nothing when failure', async () => {
+  it('should reject when error', async () => {
     getBalanceMock.mockRejectedValue('error')
 
-    const result = await getBalance(handler, account)
+    expect(getBalance(handler, account)).rejects.toBe('error')
 
-    expect(result).toBeUndefined()
     expect(getBalanceMock).toBeCalledTimes(1)
     expect(getBalanceMock.mock.calls[0][0]).toBe(account)
   })

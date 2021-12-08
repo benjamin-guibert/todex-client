@@ -40,6 +40,8 @@
   "dependencies": {
     "@metamask/detect-provider": "^1.2.0",
     "ethers": "^5.5.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
     "numeral": "^2.0.6",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -49,6 +51,7 @@
     "@testing-library/react": "^12.1.2",
     "@tsconfig/create-react-app": "^1.0.2",
     "@types/jest": "^27.0.3",
+    "@types/lodash": "^4.14.177",
     "@types/numeral": "^2.0.2",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",

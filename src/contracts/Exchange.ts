@@ -122,10 +122,10 @@ export interface ExchangeInterface extends utils.Interface {
 
   events: {
     "CancelOrder(uint256,address,address,uint256,address,uint256)": EventFragment;
-    "CreateOrder(uint256,address,address,uint256,address,uint256)": EventFragment;
+    "CreateOrder(uint256,address,address,uint256,address,uint256,uint256)": EventFragment;
     "DepositEther(address,uint256,uint256)": EventFragment;
     "DepositToken(address,address,uint256,uint256)": EventFragment;
-    "Trade(uint256,address,address,uint256,address,address,uint256)": EventFragment;
+    "Trade(uint256,address,address,uint256,address,address,uint256,uint256)": EventFragment;
     "WithdrawEther(address,uint256,uint256)": EventFragment;
     "WithdrawToken(address,address,uint256,uint256)": EventFragment;
   };
@@ -154,7 +154,7 @@ export type CancelOrderEvent = TypedEvent<
 export type CancelOrderEventFilter = TypedEventFilter<CancelOrderEvent>;
 
 export type CreateOrderEvent = TypedEvent<
-  [BigNumber, string, string, BigNumber, string, BigNumber],
+  [BigNumber, string, string, BigNumber, string, BigNumber, BigNumber],
   {
     id: BigNumber;
     account: string;
@@ -162,6 +162,7 @@ export type CreateOrderEvent = TypedEvent<
     sellAmount: BigNumber;
     buyToken: string;
     buyAmount: BigNumber;
+    timestamp: BigNumber;
   }
 >;
 
@@ -182,7 +183,7 @@ export type DepositTokenEvent = TypedEvent<
 export type DepositTokenEventFilter = TypedEventFilter<DepositTokenEvent>;
 
 export type TradeEvent = TypedEvent<
-  [BigNumber, string, string, BigNumber, string, string, BigNumber],
+  [BigNumber, string, string, BigNumber, string, string, BigNumber, BigNumber],
   {
     orderId: BigNumber;
     sellAccount: string;
@@ -191,6 +192,7 @@ export type TradeEvent = TypedEvent<
     buyAccount: string;
     buyToken: string;
     buyAmount: BigNumber;
+    timestamp: BigNumber;
   }
 >;
 
@@ -264,7 +266,7 @@ export interface Exchange extends BaseContract {
 
     feeAccount(overrides?: CallOverrides): Promise<[string]>;
 
-    feePercent(overrides?: CallOverrides): Promise<[number]>;
+    feePercent(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     fillOrder(
       _id: BigNumberish,
@@ -275,7 +277,16 @@ export interface Exchange extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, number, string, string, BigNumber, string, BigNumber] & {
+      [
+        BigNumber,
+        number,
+        string,
+        string,
+        BigNumber,
+        string,
+        BigNumber,
+        BigNumber
+      ] & {
         id: BigNumber;
         status: number;
         account: string;
@@ -283,6 +294,7 @@ export interface Exchange extends BaseContract {
         sellAmount: BigNumber;
         buyToken: string;
         buyAmount: BigNumber;
+        timestamp: BigNumber;
       }
     >;
 
@@ -331,7 +343,7 @@ export interface Exchange extends BaseContract {
 
   feeAccount(overrides?: CallOverrides): Promise<string>;
 
-  feePercent(overrides?: CallOverrides): Promise<number>;
+  feePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
   fillOrder(
     _id: BigNumberish,
@@ -342,7 +354,16 @@ export interface Exchange extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, number, string, string, BigNumber, string, BigNumber] & {
+    [
+      BigNumber,
+      number,
+      string,
+      string,
+      BigNumber,
+      string,
+      BigNumber,
+      BigNumber
+    ] & {
       id: BigNumber;
       status: number;
       account: string;
@@ -350,6 +371,7 @@ export interface Exchange extends BaseContract {
       sellAmount: BigNumber;
       buyToken: string;
       buyAmount: BigNumber;
+      timestamp: BigNumber;
     }
   >;
 
@@ -393,7 +415,7 @@ export interface Exchange extends BaseContract {
 
     feeAccount(overrides?: CallOverrides): Promise<string>;
 
-    feePercent(overrides?: CallOverrides): Promise<number>;
+    feePercent(overrides?: CallOverrides): Promise<BigNumber>;
 
     fillOrder(_id: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
@@ -401,7 +423,16 @@ export interface Exchange extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, number, string, string, BigNumber, string, BigNumber] & {
+      [
+        BigNumber,
+        number,
+        string,
+        string,
+        BigNumber,
+        string,
+        BigNumber,
+        BigNumber
+      ] & {
         id: BigNumber;
         status: number;
         account: string;
@@ -409,6 +440,7 @@ export interface Exchange extends BaseContract {
         sellAmount: BigNumber;
         buyToken: string;
         buyAmount: BigNumber;
+        timestamp: BigNumber;
       }
     >;
 
@@ -448,13 +480,14 @@ export interface Exchange extends BaseContract {
       buyAmount?: null
     ): CancelOrderEventFilter;
 
-    "CreateOrder(uint256,address,address,uint256,address,uint256)"(
+    "CreateOrder(uint256,address,address,uint256,address,uint256,uint256)"(
       id?: null,
       account?: null,
       sellToken?: null,
       sellAmount?: null,
       buyToken?: null,
-      buyAmount?: null
+      buyAmount?: null,
+      timestamp?: null
     ): CreateOrderEventFilter;
     CreateOrder(
       id?: null,
@@ -462,7 +495,8 @@ export interface Exchange extends BaseContract {
       sellToken?: null,
       sellAmount?: null,
       buyToken?: null,
-      buyAmount?: null
+      buyAmount?: null,
+      timestamp?: null
     ): CreateOrderEventFilter;
 
     "DepositEther(address,uint256,uint256)"(
@@ -489,14 +523,15 @@ export interface Exchange extends BaseContract {
       newBalance?: null
     ): DepositTokenEventFilter;
 
-    "Trade(uint256,address,address,uint256,address,address,uint256)"(
+    "Trade(uint256,address,address,uint256,address,address,uint256,uint256)"(
       orderId?: null,
       sellAccount?: null,
       sellToken?: null,
       sellAmount?: null,
       buyAccount?: null,
       buyToken?: null,
-      buyAmount?: null
+      buyAmount?: null,
+      timestamp?: null
     ): TradeEventFilter;
     Trade(
       orderId?: null,
@@ -505,7 +540,8 @@ export interface Exchange extends BaseContract {
       sellAmount?: null,
       buyAccount?: null,
       buyToken?: null,
-      buyAmount?: null
+      buyAmount?: null,
+      timestamp?: null
     ): TradeEventFilter;
 
     "WithdrawEther(address,uint256,uint256)"(

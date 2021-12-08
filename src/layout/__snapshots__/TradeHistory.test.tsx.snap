@@ -1,0 +1,110 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<TradeHistory /> should render when no trades 1`] = `
+<div
+  className="sc-bdvvtL iytLv container"
+>
+  <table
+    className="table table-dark"
+  >
+    <thead>
+      <tr
+        className="text-center"
+      >
+        <th>
+          Time
+        </th>
+        <th>
+          Amount
+        </th>
+        <th>
+          Price
+        </th>
+        <th>
+          Total
+        </th>
+      </tr>
+    </thead>
+    <tbody />
+  </table>
+</div>
+`;
+
+exports[`<TradeHistory /> should render when trades 1`] = `
+<div
+  className="sc-bdvvtL iytLv container"
+>
+  <table
+    className="table table-dark"
+  >
+    <thead>
+      <tr
+        className="text-center"
+      >
+        <th>
+          Time
+        </th>
+        <th>
+          Amount
+        </th>
+        <th>
+          Price
+        </th>
+        <th>
+          Total
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        className="font-monospace"
+      >
+        <td
+          className="text-center text-muted"
+        >
+          16:52
+        </td>
+        <td
+          className="text-end"
+        >
+          1,000
+        </td>
+        <td
+          className="text-end"
+        >
+          0.001
+        </td>
+        <td
+          className="text-end"
+        >
+          1
+        </td>
+      </tr>
+      <tr
+        className="font-monospace"
+      >
+        <td
+          className="text-center text-muted"
+        >
+          16:52
+        </td>
+        <td
+          className="text-end"
+        >
+          1,000
+        </td>
+        <td
+          className="text-end"
+        >
+          0.001
+        </td>
+        <td
+          className="text-end"
+        >
+          1
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;

@@ -24,6 +24,7 @@ const createExchangeContextValue = (): ExchangeContextValue => {
     initialized: true,
     ethBalance: undefined,
     tokenBalance: undefined,
+    trades: [],
     initialize: jest.fn(),
     setAccount: jest.fn(),
     updateBalances: jest.fn(),

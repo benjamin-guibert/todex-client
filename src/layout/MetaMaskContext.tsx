@@ -12,18 +12,18 @@ export enum InitializationStatus {
 
 export interface MetaMaskContextValue {
   initializationStatus: InitializationStatus
-  account: string | undefined
+  account: string | null | undefined
   balance: string | undefined
   initialize: () => Promise<Web3Provider | undefined>
-  connect: () => Promise<string | undefined>
-  getAccount: () => Promise<string | undefined>
+  connect: () => Promise<string | null | undefined>
+  getAccount: () => Promise<string | null | undefined>
   getBalance: (account: string) => Promise<string | undefined>
 }
 
 export const useMetaMaskContext = (): MetaMaskContextValue => {
   const metaMaskHandlerRef = useRef<MetaMaskHandler>()
   const [initializationStatus, setInitializationStatus] = useState<InitializationStatus>(InitializationStatus.None)
-  const [account, setAccount] = useState<string | undefined>()
+  const [account, setAccount] = useState<string | null>()
   const [balance, setBalance] = useState<string | undefined>()
 
   const initializeValue = async () => {
@@ -34,8 +34,6 @@ export const useMetaMaskContext = (): MetaMaskContextValue => {
       }
 
       setInitializationStatus(InitializationStatus.Initialized)
-
-      getAccountValue()
     } catch {
       setInitializationStatus(InitializationStatus.Error)
     }
