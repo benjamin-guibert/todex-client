@@ -62,7 +62,7 @@ exports[`<TradeHistory /> should render when trades 1`] = `
         <td
           className="text-center text-muted"
         >
-          16:52
+          15:52
         </td>
         <td
           className="text-end"
@@ -86,7 +86,7 @@ exports[`<TradeHistory /> should render when trades 1`] = `
         <td
           className="text-center text-muted"
         >
-          16:52
+          15:52
         </td>
         <td
           className="text-end"

@@ -26,7 +26,8 @@
       "!src/index{,.style}.tsx",
       "!src/react-app-env.d.ts",
       "!src/contracts/**/*"
-    ]
+    ],
+    "globalSetup": "./jest-setup.js"
   },
   "scripts": {
     "format": "prettier --write .",
