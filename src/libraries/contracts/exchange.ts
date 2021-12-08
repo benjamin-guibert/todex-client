@@ -8,6 +8,7 @@ import { DECIMALS, getDateFromUnixTimestamp } from './helpers'
 
 const { AddressZero, Zero } = constants
 const ETHER_ADDRESS = AddressZero
+export const TRADES_LIMIT = 20
 
 export enum TradeType {
   Sell = 0,
@@ -93,7 +94,7 @@ export const unsubscribeTrades = ({ exchange, tradeListeners }: ExchangeHandler,
 export const getAllTrades = async ({ exchange }: ExchangeHandler): Promise<Trade[]> => {
   const events = await exchange.queryFilter(exchange.filters.Trade())
   return orderBy(
-    events.map(({ args }) => getTradeFromEvent(args)),
+    events.slice(-TRADES_LIMIT).map(({ args }) => getTradeFromEvent(args)),
     ['timestamp'],
     ['desc']
   )
@@ -126,17 +127,6 @@ const getTradeFromEvent = ({
     totalPrice: totalPrice.toString(),
   }
 }
-
-// const getTokenType = (address: string) => {
-//   switch (address) {
-//     case ETHER_ADDRESS:
-//       return TokenType.Ether
-//     case getTokenAddress():
-//       return TokenType.ToDEX
-//     default:
-//       return TokenType.Unknown
-//   }
-// }
 
 const getTradeType = (buyToken: string) => {
   return buyToken == ETHER_ADDRESS ? TradeType.Sell : TradeType.Buy

@@ -9,6 +9,7 @@ import {
   initializeContract,
   subscribeTrades,
   Trade,
+  TRADES_LIMIT,
   unsubscribeTrades,
 } from 'libraries/contracts/exchange'
 
@@ -32,7 +33,7 @@ export const useExchangeContext = (): ExchangeContextValue => {
   const [trades, setTrades] = useState<Trade[]>([])
 
   const addTrade = (trade: Trade) => {
-    setTrades((trades) => [trade, ...trades])
+    setTrades((trades) => [trade, ...trades].slice(TRADES_LIMIT))
   }
 
   const initializeValue = async (provider: Web3Provider, token: Token) => {

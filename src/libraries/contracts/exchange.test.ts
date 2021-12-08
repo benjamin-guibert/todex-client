@@ -313,6 +313,47 @@ describe('getAllTrades()', () => {
     expect(queryFilterMock).toBeCalledTimes(1)
   })
 
+  it('should return limited trades', async () => {
+    const sellAccount = '0xA'
+    const ethToken = ETHER_ADDRESS
+    const ethAmount = parseEther('1')
+    const buyAccount = '0xB'
+    const tokenToken = '0x1'
+    const tokenAmount = parseEther('1000')
+    const createTrade = (id: number, timestamp: BigNumber) => {
+      return {
+        args: {
+          orderId: BigNumber.from(id),
+          sellAccount,
+          sellToken: ethToken,
+          sellAmount: ethAmount,
+          buyAccount,
+          buyToken: tokenToken,
+          buyAmount: tokenAmount,
+          timestamp,
+        },
+      }
+    }
+    const events = []
+    for (let index = 1; index <= 30; index++) {
+      events.push(createTrade(index, BigNumber.from(timestamp.toNumber() + index * 10000)))
+    }
+    const handler = {
+      token,
+      exchange,
+      tradeListeners: [],
+    }
+    queryFilterMock.mockReturnValue(events)
+
+    const trades = await getAllTrades(handler)
+
+    expect(trades).toHaveLength(20)
+    expect(trades[0].orderId).toBe('30')
+    expect(trades[19].orderId).toBe('11')
+    expect(TradeMock).toBeCalledTimes(1)
+    expect(queryFilterMock).toBeCalledTimes(1)
+  })
+
   it('should reject when error', () => {
     const handler = {
       token,
