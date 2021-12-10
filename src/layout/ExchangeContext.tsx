@@ -12,6 +12,7 @@ import {
   TRADES_LIMIT,
   unsubscribeTrades,
 } from 'libraries/contracts/exchange'
+import { uniqBy } from 'lodash'
 
 export interface ExchangeContextValue {
   initialized: boolean
@@ -33,7 +34,7 @@ export const useExchangeContext = (): ExchangeContextValue => {
   const [trades, setTrades] = useState<Trade[]>([])
 
   const addTrade = (trade: Trade) => {
-    setTrades((trades) => [trade, ...trades].slice(TRADES_LIMIT))
+    setTrades((trades) => uniqBy([trade, ...trades].slice(0, TRADES_LIMIT - 1), 'orderId'))
   }
 
   const initializeValue = async (provider: Web3Provider, token: Token) => {

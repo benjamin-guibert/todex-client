@@ -2,7 +2,7 @@
 
 exports[`<App /> should render when not initialized 1`] = `
 <div
-  className="sc-hKwDye VuQbL bg-dark text-light"
+  className="sc-hKwDye lbA-dlt bg-dark text-light"
 >
   <nav
     className="sc-bdvvtL dqBChi navbar navbar-expand navbar-light bg-light"

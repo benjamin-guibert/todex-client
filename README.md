@@ -32,7 +32,7 @@ yarn install
 Run the client locally in development mode:
 
 ```bash
-yarn start
+yarn server
 ```
 
 The application will be available from `http://localhost:3000` by default.
