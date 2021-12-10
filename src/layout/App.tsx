@@ -3,22 +3,22 @@ import { Web3Provider } from '@ethersproject/providers'
 import { Token } from '../contracts/Token'
 import { MetaMaskContext, useMetaMaskContext } from './MetaMaskContext'
 import { ExchangeContext, useExchangeContext } from './ExchangeContext'
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
 import Alert from 'react-bootstrap/Alert'
 import Header from './Header'
 import MetaMaskModal from './MetaMaskModal'
 import { initializeContract } from 'libraries/contracts/token'
+import TradeHistory from './TradeHistory'
+import StyledApp, { MainContainer } from './App.style'
 
 const App: FC = () => {
   const metaMaskContextValue = useMetaMaskContext()
   const exchangeContextValue = useExchangeContext()
-  const { initialize: initializeMetaMask, account } = metaMaskContextValue
-  const { initialize: initializeExchange, setAccount } = exchangeContextValue
+  const { initialize: initializeMetaMask, getAccount, account } = metaMaskContextValue
+  const { initialized, initialize: initializeExchange, setAccount } = exchangeContextValue
   const initializeMetaMaskRef = useRef<() => Promise<Web3Provider | undefined>>(initializeMetaMask)
+  const getAccountRef = useRef<() => Promise<string | null | undefined>>(getAccount)
   const initializeExchangeRef = useRef<(provider: Web3Provider, token: Token) => Promise<boolean>>(initializeExchange)
-  const setExchangeAccountRef = useRef<(account: string | undefined) => void>(setAccount)
+  const setExchangeAccountRef = useRef<(account: string | null | undefined) => void>(setAccount)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -29,49 +29,41 @@ const App: FC = () => {
         return
       }
 
-      const token = initializeContract(provider)
-      if (!token?.token) {
+      let token: Token
+
+      try {
+        token = initializeContract(provider).token
+      } catch {
         setError('Error while initializing token.')
         return
       }
 
-      const exchangeInitialized = await initializeExchangeRef.current(provider, token.token)
+      const exchangeInitialized = await initializeExchangeRef.current(provider, token)
       if (!exchangeInitialized) {
         return setError('Error while initializing exchange.')
       }
+
+      getAccountRef.current()
     }
 
     initialize()
-  }, [initializeMetaMaskRef, initializeExchangeRef])
+  }, [initializeMetaMaskRef, initializeExchangeRef, getAccountRef])
 
   useEffect(() => {
     setExchangeAccountRef.current(account)
   }, [account])
 
   return (
-    <div>
+    <StyledApp className="bg-dark text-light">
       <MetaMaskContext.Provider value={metaMaskContextValue}>
         <ExchangeContext.Provider value={exchangeContextValue}>
           <Header />
           {!!error && <Alert variant="danger">{error}</Alert>}
-          <Container className="bg-dark text-light" fluid>
-            <Row>
-              <Col>
-                <Row></Row>
-                <Row></Row>
-              </Col>
-              <Col></Col>
-              <Col>
-                <Row></Row>
-                <Row></Row>
-              </Col>
-              <Col></Col>
-            </Row>
-          </Container>
+          <MainContainer fluid>{initialized && <TradeHistory />}</MainContainer>
           <MetaMaskModal />
         </ExchangeContext.Provider>
       </MetaMaskContext.Provider>
-    </div>
+    </StyledApp>
   )
 }
 

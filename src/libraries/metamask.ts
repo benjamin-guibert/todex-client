@@ -19,28 +19,20 @@ export const initialize = async (): Promise<MetaMaskHandler | undefined> => {
   }
 }
 
-export const connect = async (handler: MetaMaskHandler): Promise<string | undefined> => {
-  try {
-    await handler.provider.send('eth_requestAccounts', [])
+export const connect = async (handler: MetaMaskHandler): Promise<string | null> => {
+  await handler.provider.send('eth_requestAccounts', [])
 
-    return getAccount(handler)
+  return getAccount(handler)
+}
+
+export const getAccount = async ({ provider }: MetaMaskHandler): Promise<string | null> => {
+  try {
+    return await provider.getSigner().getAddress()
   } catch {
-    return
+    return null
   }
 }
 
-export const getAccount = async (handler: MetaMaskHandler): Promise<string | undefined> => {
-  try {
-    return (await handler.provider.listAccounts())?.[0] as string | undefined
-  } catch {
-    return
-  }
-}
-
-export const getBalance = async (handler: MetaMaskHandler, account: string): Promise<BigNumber | undefined> => {
-  try {
-    return await handler.provider.getBalance(account)
-  } catch {
-    return
-  }
+export const getBalance = async ({ provider }: MetaMaskHandler, account: string): Promise<BigNumber | undefined> => {
+  return await provider.getBalance(account)
 }

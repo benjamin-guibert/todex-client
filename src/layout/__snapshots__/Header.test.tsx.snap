@@ -2,7 +2,7 @@
 
 exports[`<Header /> should render when MetaMask initialized 1`] = `
 <nav
-  className="sc-bdvvtL dkPJRw navbar navbar-expand navbar-dark bg-dark"
+  className="sc-bdvvtL dqBChi navbar navbar-expand navbar-light bg-light"
 >
   <div
     className="container-fluid"
@@ -20,7 +20,7 @@ exports[`<Header /> should render when MetaMask initialized 1`] = `
     <span
       className="navbar-text"
     >
-      ToDEX 1,000.5
+      TDX 1,000.5
     </span>
     <button
       className="btn btn-primary"
@@ -36,7 +36,7 @@ exports[`<Header /> should render when MetaMask initialized 1`] = `
 
 exports[`<Header /> should render when MetaMask not initialized 1`] = `
 <nav
-  className="sc-bdvvtL dkPJRw navbar navbar-expand navbar-dark bg-dark"
+  className="sc-bdvvtL dqBChi navbar navbar-expand navbar-light bg-light"
 >
   <div
     className="container-fluid"
@@ -52,7 +52,7 @@ exports[`<Header /> should render when MetaMask not initialized 1`] = `
 
 exports[`<Header /> should render when no account connected 1`] = `
 <nav
-  className="sc-bdvvtL dkPJRw navbar navbar-expand navbar-dark bg-dark"
+  className="sc-bdvvtL dqBChi navbar navbar-expand navbar-light bg-light"
 >
   <div
     className="container-fluid"
