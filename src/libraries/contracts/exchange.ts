@@ -116,6 +116,14 @@ export const depositToken = async ({ exchange, token }: ExchangeHandler, amount:
   await exchange.depositToken(token.address, amount)
 }
 
+export const withdrawEther = async ({ exchange }: ExchangeHandler, amount: BigNumber): Promise<void> => {
+  await exchange.withdrawEther(amount)
+}
+
+export const withdrawToken = async ({ token, exchange }: ExchangeHandler, amount: BigNumber): Promise<void> => {
+  await exchange.withdrawToken(token.address, amount)
+}
+
 const getTradeFromEvent = ({
   orderId,
   sellAmount,

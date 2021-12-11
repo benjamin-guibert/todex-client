@@ -15,6 +15,8 @@ import {
   Trade,
   TRADES_LIMIT,
   unsubscribeTrades,
+  withdrawEther,
+  withdrawToken,
 } from 'libraries/contracts/exchange'
 import uniqBy from 'lodash/uniqBy'
 import { BigNumber } from 'ethers'
@@ -31,6 +33,8 @@ export interface ExchangeContextValue {
   approveToken: (amount: BigNumber) => Promise<void>
   depositEther: (amount: BigNumber) => Promise<void>
   depositToken: (amount: BigNumber) => Promise<void>
+  withdrawEther: (amount: BigNumber) => Promise<void>
+  withdrawToken: (amount: BigNumber) => Promise<void>
 }
 
 export const useExchangeContext = (): ExchangeContextValue => {
@@ -124,6 +128,22 @@ export const useExchangeContext = (): ExchangeContextValue => {
     await depositToken(exchangeHandlerRef.current, amount)
   }
 
+  const withdrawEtherValue = async (amount: BigNumber) => {
+    if (!exchangeHandlerRef.current) {
+      return
+    }
+
+    await withdrawEther(exchangeHandlerRef.current, amount)
+  }
+
+  const withdrawTokenValue = async (amount: BigNumber) => {
+    if (!exchangeHandlerRef.current) {
+      return
+    }
+
+    await withdrawToken(exchangeHandlerRef.current, amount)
+  }
+
   useEffect(() => {
     updateBalancesValue()
   }, [updateBalancesValue, account])
@@ -140,6 +160,8 @@ export const useExchangeContext = (): ExchangeContextValue => {
     approveToken: approveTokenValue,
     depositEther: depositEtherValue,
     depositToken: depositTokenValue,
+    withdrawEther: withdrawEtherValue,
+    withdrawToken: withdrawTokenValue,
   }
 }
 
@@ -155,4 +177,6 @@ export const ExchangeContext = createContext<ExchangeContextValue>({
   approveToken: async () => undefined,
   depositEther: async () => undefined,
   depositToken: async () => undefined,
+  withdrawEther: async () => undefined,
+  withdrawToken: async () => undefined,
 })

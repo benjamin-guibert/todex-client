@@ -48,6 +48,7 @@ exports[`<DepositWithdraw /> should render 1`] = `
           <button
             className="btn btn-primary"
             disabled={true}
+            onClick={[Function]}
             type="button"
           >
             Withdraw
@@ -100,6 +101,7 @@ exports[`<DepositWithdraw /> should render 1`] = `
           <button
             className="btn btn-primary"
             disabled={true}
+            onClick={[Function]}
             type="button"
           >
             Withdraw

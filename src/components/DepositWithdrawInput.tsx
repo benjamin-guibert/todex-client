@@ -17,17 +17,27 @@ interface AmountInput {
 interface DepositWithdrawInputProps {
   name: string
   onDeposit: (amount: BigNumber) => void
-  isDepositAllowed?: (amount: BigNumber) => Promise<boolean>
+  onWithdraw: (amount: BigNumber) => void
+  currentBalance: BigNumber
+  isDepositAllowed?: (amount: BigNumber) => boolean | Promise<boolean>
   onApprove?: (amount: BigNumber) => Promise<void>
 }
 
-const DepositWithdrawInput: FC<DepositWithdrawInputProps> = ({ name, onDeposit, isDepositAllowed, onApprove }) => {
+const DepositWithdrawInput: FC<DepositWithdrawInputProps> = ({
+  name,
+  onDeposit,
+  onWithdraw,
+  currentBalance,
+  isDepositAllowed,
+  onApprove,
+}) => {
   const [amountInput, setAmountInput] = useState<AmountInput>({
     value: '',
     isValid: undefined,
     invalidMessage: undefined,
   })
   const [canDeposit, setCanDeposit] = useState<boolean>(!isDepositAllowed)
+  const [canWithdraw, setCanWithdraw] = useState<boolean>(false)
 
   const approveAmount = () => {
     if (!onApprove || !amountInput.isValid) {
@@ -50,6 +60,19 @@ const DepositWithdrawInput: FC<DepositWithdrawInputProps> = ({ name, onDeposit, 
     })
   }
 
+  const withdrawAmount = () => {
+    if (!amountInput.isValid) {
+      return
+    }
+
+    onWithdraw(parseEther(amountInput.value))
+    setAmountInput({
+      value: '',
+      isValid: undefined,
+      invalidMessage: undefined,
+    })
+  }
+
   useEffect(() => {
     const checkAmountInput = async () => {
       if (amountInput.value == '') {
@@ -65,17 +88,19 @@ const DepositWithdrawInput: FC<DepositWithdrawInputProps> = ({ name, onDeposit, 
         })
       }
 
+      const parsedAmount = parseEther(amountInput.value)
       if (isDepositAllowed) {
-        setCanDeposit(await isDepositAllowed(parseEther(amountInput.value)))
+        setCanDeposit(await isDepositAllowed(parsedAmount))
       }
 
+      setCanWithdraw(parsedAmount.lte(currentBalance))
       setAmountInput((previousInput) => {
         return { ...previousInput, isValid: true, invalidMessage: undefined }
       })
     }
 
     checkAmountInput()
-  }, [amountInput.value, isDepositAllowed])
+  }, [amountInput.value, isDepositAllowed, currentBalance])
 
   return (
     <Card className="m-3 px-2 py-1">
@@ -109,7 +134,9 @@ const DepositWithdrawInput: FC<DepositWithdrawInputProps> = ({ name, onDeposit, 
                 Deposit (Approve)
               </Button>
             )}
-            <Button disabled={!amountInput.isValid}>Withdraw</Button>
+            <Button onClick={withdrawAmount} disabled={!canWithdraw || !amountInput.isValid}>
+              Withdraw
+            </Button>
           </ButtonGroup>
         </Row>
       </Form>
