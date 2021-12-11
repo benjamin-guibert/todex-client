@@ -7,9 +7,9 @@ export const MainContainer = styled(Container)`
   grid-template-columns: auto auto auto min-content;
   grid-template-rows: 1fr 1fr 1fr;
   grid-template-areas:
-    '. . . trade-history'
-    '. . . trade-history'
-    '. . . trade-history';
+    'deposit-withdraw . . trade-history'
+    '.                . . trade-history'
+    '.                . . trade-history';
   column-gap: ${Spacers.m};
   row-gap: ${Spacers.m};
   padding: ${Spacers.m};

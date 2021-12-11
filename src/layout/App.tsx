@@ -7,6 +7,7 @@ import Alert from 'react-bootstrap/Alert'
 import Header from './Header'
 import MetaMaskModal from './MetaMaskModal'
 import { initializeContract } from 'libraries/contracts/token'
+import DepositWithdraw from './DepositWithdraw'
 import TradeHistory from './TradeHistory'
 import StyledApp, { MainContainer } from './App.style'
 
@@ -59,7 +60,14 @@ const App: FC = () => {
         <ExchangeContext.Provider value={exchangeContextValue}>
           <Header />
           {!!error && <Alert variant="danger">{error}</Alert>}
-          <MainContainer fluid>{initialized && <TradeHistory />}</MainContainer>
+          <MainContainer fluid>
+            {initialized && (
+              <>
+                <DepositWithdraw />
+                <TradeHistory />
+              </>
+            )}
+          </MainContainer>
           <MetaMaskModal />
         </ExchangeContext.Provider>
       </MetaMaskContext.Provider>

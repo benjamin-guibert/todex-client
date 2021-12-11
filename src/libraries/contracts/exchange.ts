@@ -100,6 +100,22 @@ export const getAllTrades = async ({ exchange }: ExchangeHandler): Promise<Trade
   )
 }
 
+export const getTokenAllowance = async ({ token, exchange }: ExchangeHandler, account: string): Promise<BigNumber> => {
+  return await token.allowance(account, exchange.address)
+}
+
+export const approveToken = async ({ token, exchange }: ExchangeHandler, amount: BigNumber): Promise<void> => {
+  await token.approve(exchange.address, amount)
+}
+
+export const depositEther = async ({ exchange }: ExchangeHandler, amount: BigNumber): Promise<void> => {
+  await exchange.depositEther({ value: amount })
+}
+
+export const depositToken = async ({ exchange, token }: ExchangeHandler, amount: BigNumber): Promise<void> => {
+  await exchange.depositToken(token.address, amount)
+}
+
 const getTradeFromEvent = ({
   orderId,
   sellAmount,

@@ -5,8 +5,13 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { parseEther } from 'ethers/lib/utils'
 import { BURN_ADDRESS } from './helpers'
 import {
+  approveToken,
+  depositEther,
+  depositToken,
+  ExchangeHandler,
   getAllTrades,
   getEthBalance,
+  getTokenAllowance,
   getTokenBalance,
   initializeContract,
   subscribeTrades,
@@ -16,13 +21,18 @@ import {
 
 const ETHER_ADDRESS = BURN_ADDRESS
 const TOKEN_ADDRESS = '0x1'
+const EXCHANGE_ADDRESS = '0x2'
 process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS = TOKEN_ADDRESS
 const timestamp = BigNumber.from('1612345678')
 const provider = {
   getSigner: jest.fn(),
 } as unknown as Web3Provider
+const allowanceMock = jest.fn()
+const approveMock = jest.fn()
 const token = {
-  address: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
+  address: TOKEN_ADDRESS,
+  allowance: allowanceMock,
+  approve: approveMock,
 } as unknown as Token
 const ethBalanceOfMock = jest.fn()
 const tokenBalanceOfMock = jest.fn()
@@ -30,7 +40,10 @@ const onMock = jest.fn()
 const offMock = jest.fn()
 const queryFilterMock = jest.fn()
 const TradeMock = jest.fn()
+const depositEtherMock = jest.fn()
+const depositTokenMock = jest.fn()
 const exchange = {
+  address: EXCHANGE_ADDRESS,
   ethBalanceOf: ethBalanceOfMock,
   tokenBalanceOf: tokenBalanceOfMock,
   on: onMock,
@@ -39,7 +52,17 @@ const exchange = {
     Trade: TradeMock,
   },
   queryFilter: queryFilterMock,
+  depositEther: depositEtherMock,
+  depositToken: depositTokenMock,
 } as unknown as Exchange
+
+const createHandler = (): ExchangeHandler => {
+  return {
+    token,
+    exchange,
+    tradeListeners: [],
+  }
+}
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -67,11 +90,7 @@ describe('getEthBalance()', () => {
   const amount = BigNumber.from('1000000000000000000')
 
   it('should return balance when success', async () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [],
-    }
+    const handler = createHandler()
     ethBalanceOfMock.mockResolvedValueOnce(amount)
 
     const balance = await getEthBalance(handler, account)
@@ -82,11 +101,7 @@ describe('getEthBalance()', () => {
   })
 
   it('should reject when error', () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [],
-    }
+    const handler = createHandler()
     ethBalanceOfMock.mockRejectedValueOnce('error')
 
     expect(getEthBalance(handler, account)).rejects.toBe('error')
@@ -101,11 +116,7 @@ describe('getTokenBalance()', () => {
   const amount = BigNumber.from('1000000000000000000')
 
   it('should return balance when success', async () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [],
-    }
+    const handler = createHandler()
     tokenBalanceOfMock.mockResolvedValueOnce(amount)
 
     const balance = await getTokenBalance(handler, account)
@@ -117,11 +128,7 @@ describe('getTokenBalance()', () => {
   })
 
   it('should reject when error', () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [],
-    }
+    const handler = createHandler()
     tokenBalanceOfMock.mockRejectedValueOnce('error')
 
     expect(getTokenBalance(handler, account)).rejects.toBe('error')
@@ -134,11 +141,8 @@ describe('getTokenBalance()', () => {
 
 describe('subscribeTrades()', () => {
   it('should subscribe when success', () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [jest.fn(), jest.fn()],
-    }
+    const handler = createHandler()
+    handler.tradeListeners = [jest.fn(), jest.fn()]
     const callback = jest.fn()
     const sellAccount = '0xA'
     const sellToken = ETHER_ADDRESS
@@ -170,11 +174,7 @@ describe('subscribeTrades()', () => {
   })
 
   it('should throw when error', () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [],
-    }
+    const handler = createHandler()
     const callback = jest.fn()
     onMock.mockImplementationOnce(() => {
       throw new Error('error')
@@ -186,13 +186,10 @@ describe('subscribeTrades()', () => {
   })
 })
 
-describe('unsubscribeTrades', () => {
+describe('unsubscribeTrades()', () => {
   it('should unsubscribe when success', () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [jest.fn(), jest.fn(), jest.fn()],
-    }
+    const handler = createHandler()
+    handler.tradeListeners = [jest.fn(), jest.fn(), jest.fn()]
 
     unsubscribeTrades(handler, 1)
 
@@ -205,11 +202,8 @@ describe('unsubscribeTrades', () => {
   })
 
   it('should do nothing when unknown ID', () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [jest.fn(), jest.fn(), jest.fn()],
-    }
+    const handler = createHandler()
+    handler.tradeListeners = [jest.fn(), jest.fn(), jest.fn()]
 
     unsubscribeTrades(handler, 4)
 
@@ -220,11 +214,8 @@ describe('unsubscribeTrades', () => {
   })
 
   it('should do nothing when unsubscribed', () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [jest.fn(), null, jest.fn()],
-    }
+    const handler = createHandler()
+    handler.tradeListeners = [jest.fn(), null, jest.fn()]
 
     unsubscribeTrades(handler, 1)
 
@@ -235,11 +226,9 @@ describe('unsubscribeTrades', () => {
   })
 
   it('should throw when error', () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [jest.fn(), jest.fn(), jest.fn()],
-    }
+    const handler = createHandler()
+    handler.tradeListeners = [jest.fn(), jest.fn(), jest.fn()]
+
     offMock.mockImplementation(() => {
       throw new Error('error')
     })
@@ -282,11 +271,7 @@ describe('getAllTrades()', () => {
         },
       },
     ]
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [],
-    }
+    const handler = createHandler()
     queryFilterMock.mockReturnValue(events)
 
     const trades = await getAllTrades(handler)
@@ -338,11 +323,7 @@ describe('getAllTrades()', () => {
     for (let index = 1; index <= 30; index++) {
       events.push(createTrade(index, BigNumber.from(timestamp.toNumber() + index * 10000)))
     }
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [],
-    }
+    const handler = createHandler()
     queryFilterMock.mockReturnValue(events)
 
     const trades = await getAllTrades(handler)
@@ -355,15 +336,101 @@ describe('getAllTrades()', () => {
   })
 
   it('should reject when error', () => {
-    const handler = {
-      token,
-      exchange,
-      tradeListeners: [],
-    }
+    const handler = createHandler()
     queryFilterMock.mockRejectedValueOnce('error')
 
     expect(getAllTrades(handler)).rejects.toBe('error')
 
     expect(queryFilterMock).toBeCalledTimes(1)
+  })
+})
+
+describe('getTokenAllowance()', () => {
+  const account = '0x3'
+
+  it('should return allowance when success', async () => {
+    const handler = createHandler()
+    const allowance = BigNumber.from('1000')
+    allowanceMock.mockResolvedValueOnce(allowance)
+
+    const result = await getTokenAllowance(handler, account)
+
+    expect(result).toBe(allowance)
+    expect(allowanceMock).toBeCalledTimes(1)
+    expect(allowanceMock.mock.calls[0][0]).toBe(account)
+    expect(allowanceMock.mock.calls[0][1]).toBe(EXCHANGE_ADDRESS)
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    allowanceMock.mockRejectedValueOnce('error')
+
+    expect(getTokenAllowance(handler, account)).rejects.toBe('error')
+    expect(allowanceMock).toBeCalledTimes(1)
+  })
+})
+
+describe('approveToken()', () => {
+  const amount = BigNumber.from('1000')
+
+  it('should approve when success', () => {
+    const handler = createHandler()
+
+    approveToken(handler, amount)
+
+    expect(approveMock).toBeCalledTimes(1)
+    expect(approveMock.mock.calls[0][0]).toBe(EXCHANGE_ADDRESS)
+    expect(approveMock.mock.calls[0][1]).toBe(amount)
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    approveMock.mockRejectedValueOnce('error')
+
+    expect(approveToken(handler, amount)).rejects.toBe('error')
+    expect(approveMock).toBeCalledTimes(1)
+  })
+})
+
+describe('depositEther()', () => {
+  const amount = BigNumber.from('1000')
+
+  it('should approve when success', () => {
+    const handler = createHandler()
+
+    depositEther(handler, amount)
+
+    expect(depositEtherMock).toBeCalledTimes(1)
+    expect(depositEtherMock.mock.calls[0][0]).toEqual({ value: amount })
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    depositEtherMock.mockRejectedValueOnce('error')
+
+    expect(depositEther(handler, amount)).rejects.toBe('error')
+    expect(depositEtherMock).toBeCalledTimes(1)
+  })
+})
+
+describe('depositToken()', () => {
+  const amount = BigNumber.from('1000')
+
+  it('should approve when success', () => {
+    const handler = createHandler()
+
+    depositToken(handler, amount)
+
+    expect(depositTokenMock).toBeCalledTimes(1)
+    expect(depositTokenMock.mock.calls[0][0]).toBe(TOKEN_ADDRESS)
+    expect(depositTokenMock.mock.calls[0][1]).toEqual(amount)
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    depositTokenMock.mockRejectedValueOnce('error')
+
+    expect(depositToken(handler, amount)).rejects.toBe('error')
+    expect(depositTokenMock).toBeCalledTimes(1)
   })
 })

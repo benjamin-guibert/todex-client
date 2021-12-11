@@ -2,7 +2,7 @@
 
 exports[`<TradeHistory /> should render when no trades 1`] = `
 <div
-  className="sc-bdvvtL cFBJKp container"
+  className="sc-bdvvtL iytLv container"
 >
   <table
     className="table table-dark"
@@ -32,7 +32,7 @@ exports[`<TradeHistory /> should render when no trades 1`] = `
 
 exports[`<TradeHistory /> should render when trades 1`] = `
 <div
-  className="sc-bdvvtL cFBJKp container"
+  className="sc-bdvvtL iytLv container"
 >
   <table
     className="table table-dark"

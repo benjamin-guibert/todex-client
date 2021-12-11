@@ -2,9 +2,13 @@ import { createContext, useCallback, useEffect, useRef, useState } from 'react'
 import { Web3Provider } from '@ethersproject/providers'
 import { Token } from 'contracts/Token'
 import {
+  approveToken,
+  depositEther,
+  depositToken,
   ExchangeHandler,
   getAllTrades,
   getEthBalance,
+  getTokenAllowance,
   getTokenBalance,
   initializeContract,
   subscribeTrades,
@@ -12,7 +16,8 @@ import {
   TRADES_LIMIT,
   unsubscribeTrades,
 } from 'libraries/contracts/exchange'
-import { uniqBy } from 'lodash'
+import uniqBy from 'lodash/uniqBy'
+import { BigNumber } from 'ethers'
 
 export interface ExchangeContextValue {
   initialized: boolean
@@ -22,6 +27,10 @@ export interface ExchangeContextValue {
   initialize: (provider: Web3Provider, token: Token) => Promise<boolean>
   setAccount: (account: string | null | undefined) => void
   updateBalances: () => Promise<void>
+  getTokenAllowance: () => Promise<BigNumber | undefined>
+  approveToken: (amount: BigNumber) => Promise<void>
+  depositEther: (amount: BigNumber) => Promise<void>
+  depositToken: (amount: BigNumber) => Promise<void>
 }
 
 export const useExchangeContext = (): ExchangeContextValue => {
@@ -52,6 +61,19 @@ export const useExchangeContext = (): ExchangeContextValue => {
     }
   }
 
+  const setAccountValue = (account: string | null | undefined) => {
+    setAccount(account)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (!exchangeHandlerRef.current || !tradeListener) {
+        return
+      }
+      unsubscribeTrades(exchangeHandlerRef.current, tradeListener)
+    }
+  }, [tradeListener])
+
   const updateBalancesValue = useCallback(async () => {
     if (!exchangeHandlerRef.current || !account) {
       return
@@ -66,18 +88,41 @@ export const useExchangeContext = (): ExchangeContextValue => {
     }
   }, [account])
 
-  const setAccountValue = (account: string | null | undefined) => {
-    setAccount(account)
+  const getTokenAllowanceValue = async () => {
+    if (!exchangeHandlerRef.current || !account) {
+      return
+    }
+
+    try {
+      return getTokenAllowance(exchangeHandlerRef.current, account)
+    } catch {
+      return
+    }
   }
 
-  useEffect(() => {
-    return () => {
-      if (!exchangeHandlerRef.current || !tradeListener) {
-        return
-      }
-      unsubscribeTrades(exchangeHandlerRef.current, tradeListener)
+  const approveTokenValue = async (amount: BigNumber) => {
+    if (!exchangeHandlerRef.current) {
+      return
     }
-  }, [tradeListener])
+
+    await approveToken(exchangeHandlerRef.current, amount)
+  }
+
+  const depositEtherValue = async (amount: BigNumber) => {
+    if (!exchangeHandlerRef.current) {
+      return
+    }
+
+    await depositEther(exchangeHandlerRef.current, amount)
+  }
+
+  const depositTokenValue = async (amount: BigNumber) => {
+    if (!exchangeHandlerRef.current) {
+      return
+    }
+
+    await depositToken(exchangeHandlerRef.current, amount)
+  }
 
   useEffect(() => {
     updateBalancesValue()
@@ -91,6 +136,10 @@ export const useExchangeContext = (): ExchangeContextValue => {
     initialize: initializeValue,
     setAccount: setAccountValue,
     updateBalances: updateBalancesValue,
+    getTokenAllowance: getTokenAllowanceValue,
+    approveToken: approveTokenValue,
+    depositEther: depositEtherValue,
+    depositToken: depositTokenValue,
   }
 }
 
@@ -102,4 +151,8 @@ export const ExchangeContext = createContext<ExchangeContextValue>({
   initialize: async () => false,
   setAccount: () => undefined,
   updateBalances: async () => undefined,
+  getTokenAllowance: async () => undefined,
+  approveToken: async () => undefined,
+  depositEther: async () => undefined,
+  depositToken: async () => undefined,
 })
