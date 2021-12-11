@@ -17,6 +17,8 @@ import {
   subscribeTrades,
   TradeType,
   unsubscribeTrades,
+  withdrawEther,
+  withdrawToken,
 } from './exchange'
 
 const ETHER_ADDRESS = BURN_ADDRESS
@@ -42,6 +44,8 @@ const queryFilterMock = jest.fn()
 const TradeMock = jest.fn()
 const depositEtherMock = jest.fn()
 const depositTokenMock = jest.fn()
+const withdrawEtherMock = jest.fn()
+const withdrawTokenMock = jest.fn()
 const exchange = {
   address: EXCHANGE_ADDRESS,
   ethBalanceOf: ethBalanceOfMock,
@@ -54,6 +58,8 @@ const exchange = {
   queryFilter: queryFilterMock,
   depositEther: depositEtherMock,
   depositToken: depositTokenMock,
+  withdrawEther: withdrawEtherMock,
+  withdrawToken: withdrawTokenMock,
 } as unknown as Exchange
 
 const createHandler = (): ExchangeHandler => {
@@ -432,5 +438,48 @@ describe('depositToken()', () => {
 
     expect(depositToken(handler, amount)).rejects.toBe('error')
     expect(depositTokenMock).toBeCalledTimes(1)
+  })
+})
+
+describe('withdrawEther()', () => {
+  const amount = BigNumber.from('1000')
+
+  it('should approve when success', () => {
+    const handler = createHandler()
+
+    withdrawEther(handler, amount)
+
+    expect(withdrawEtherMock).toBeCalledTimes(1)
+    expect(withdrawEtherMock.mock.calls[0][0]).toEqual(amount)
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    withdrawEtherMock.mockRejectedValueOnce('error')
+
+    expect(withdrawEther(handler, amount)).rejects.toBe('error')
+    expect(withdrawEtherMock).toBeCalledTimes(1)
+  })
+})
+
+describe('withdrawToken()', () => {
+  const amount = BigNumber.from('1000')
+
+  it('should approve when success', () => {
+    const handler = createHandler()
+
+    withdrawToken(handler, amount)
+
+    expect(withdrawTokenMock).toBeCalledTimes(1)
+    expect(withdrawTokenMock.mock.calls[0][0]).toBe(TOKEN_ADDRESS)
+    expect(withdrawTokenMock.mock.calls[0][1]).toEqual(amount)
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    withdrawTokenMock.mockRejectedValueOnce('error')
+
+    expect(withdrawToken(handler, amount)).rejects.toBe('error')
+    expect(withdrawTokenMock).toBeCalledTimes(1)
   })
 })
