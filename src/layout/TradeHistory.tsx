@@ -4,6 +4,7 @@ import { printAmount } from 'libraries/helpers'
 import { ExchangeContext } from './ExchangeContext'
 import Table from 'react-bootstrap/Table'
 import StyledTradeHistory from './TradeHistory.style'
+import { TradeType } from 'libraries/contracts/exchange'
 
 const TradeHistory: FC = () => {
   const { trades } = useContext(ExchangeContext)
@@ -20,11 +21,11 @@ const TradeHistory: FC = () => {
           </tr>
         </thead>
         <tbody>
-          {trades.map(({ orderId, amount, unitPrice, totalPrice, timestamp }) => {
+          {trades.map(({ orderId, type, amount, unitPrice, totalPrice, timestamp }) => {
             return (
-              <tr key={orderId} className="font-monospace">
+              <tr key={orderId} className={`font-monospace text-${type == TradeType.Buy ? 'success' : 'danger'}`}>
                 <td className="text-center text-muted">{moment(timestamp).format('HH:mm')}</td>
-                <td className="text-end">{printAmount(amount)}</td>
+                <td className="text-end">{`${type == TradeType.Buy ? '+' : '-'}${printAmount(amount)}`}</td>
                 <td className="text-end">{printAmount(unitPrice, { maxDecimals: 5 })}</td>
                 <td className="text-end">{printAmount(totalPrice)}</td>
               </tr>

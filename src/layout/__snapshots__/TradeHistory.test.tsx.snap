@@ -57,7 +57,7 @@ exports[`<TradeHistory /> should render when trades 1`] = `
     </thead>
     <tbody>
       <tr
-        className="font-monospace"
+        className="font-monospace text-success"
       >
         <td
           className="text-center text-muted"
@@ -67,7 +67,7 @@ exports[`<TradeHistory /> should render when trades 1`] = `
         <td
           className="text-end"
         >
-          1,000
+          +1,000
         </td>
         <td
           className="text-end"
@@ -81,7 +81,7 @@ exports[`<TradeHistory /> should render when trades 1`] = `
         </td>
       </tr>
       <tr
-        className="font-monospace"
+        className="font-monospace text-danger"
       >
         <td
           className="text-center text-muted"
@@ -91,7 +91,7 @@ exports[`<TradeHistory /> should render when trades 1`] = `
         <td
           className="text-end"
         >
-          1,000
+          -1,000
         </td>
         <td
           className="text-end"
