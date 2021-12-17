@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers'
-import { Token } from '../../contracts/Token'
-import { Exchange } from '../../contracts/Exchange'
+import { Token } from 'contracts/Token'
+import { Exchange } from 'contracts/Exchange'
 import { BigNumber } from '@ethersproject/bignumber'
 import { parseEther } from 'ethers/lib/utils'
 import { BURN_ADDRESS } from './helpers'
@@ -11,15 +11,20 @@ import {
   ExchangeHandler,
   getAllTrades,
   getEthBalance,
+  getPendingOrders,
   getTokenAllowance,
   getTokenBalance,
   initializeContract,
+  subscribeCancelOrders,
+  subscribeCreateOrders,
   subscribeTrades,
-  TradeType,
+  unsubscribeCancelOrders,
+  unsubscribeCreateOrders,
   unsubscribeTrades,
   withdrawEther,
   withdrawToken,
 } from './exchange'
+import { TradeType } from 'models/Trade'
 
 const ETHER_ADDRESS = BURN_ADDRESS
 const TOKEN_ADDRESS = '0x1'
@@ -42,6 +47,8 @@ const onMock = jest.fn()
 const offMock = jest.fn()
 const queryFilterMock = jest.fn()
 const TradeMock = jest.fn()
+const CreateOrderMock = jest.fn()
+const CancelOrderMock = jest.fn()
 const depositEtherMock = jest.fn()
 const depositTokenMock = jest.fn()
 const withdrawEtherMock = jest.fn()
@@ -54,6 +61,8 @@ const exchange = {
   off: offMock,
   filters: {
     Trade: TradeMock,
+    CreateOrder: CreateOrderMock,
+    CancelOrder: CancelOrderMock,
   },
   queryFilter: queryFilterMock,
   depositEther: depositEtherMock,
@@ -67,6 +76,8 @@ const createHandler = (): ExchangeHandler => {
     token,
     exchange,
     tradeListeners: [],
+    createOrderListeners: [],
+    cancelOrderListeners: [],
   }
 }
 
@@ -243,6 +254,190 @@ describe('unsubscribeTrades()', () => {
   })
 })
 
+describe('subscribeCreateOrders()', () => {
+  it('should subscribe when success', () => {
+    const handler = createHandler()
+    handler.createOrderListeners = [jest.fn(), jest.fn()]
+    const callback = jest.fn()
+    const account = '0xA'
+    const sellToken = ETHER_ADDRESS
+    const sellAmount = parseEther('1')
+    const buyToken = '0x1'
+    const buyAmount = parseEther('1000')
+
+    const id = subscribeCreateOrders(handler, callback)
+
+    expect(id).toBe(2)
+    expect(handler.createOrderListeners).toHaveLength(3)
+    expect(onMock).toBeCalledTimes(1)
+    expect(onMock.mock.calls[0][0]).toBe('CreateOrder')
+    const onCallback = onMock.mock.calls[0][1]
+    expect(onCallback).toBeDefined()
+
+    onCallback(BigNumber.from(1), account, sellToken, sellAmount, buyToken, buyAmount, timestamp)
+
+    expect(callback).toBeCalledTimes(1)
+    expect(callback.mock.calls[0][0]).toEqual({
+      orderId: '1',
+      account,
+      timestamp: new Date(timestamp.mul(1000).toNumber()),
+      type: TradeType.Buy,
+      amount: buyAmount.toString(),
+      unitPrice: parseEther('0.001').toString(),
+      totalPrice: sellAmount.toString(),
+    })
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    const callback = jest.fn()
+    onMock.mockImplementationOnce(() => {
+      throw new Error('error')
+    })
+
+    expect(() => subscribeCreateOrders(handler, callback)).toThrow('error')
+
+    expect(onMock).toBeCalledTimes(1)
+  })
+})
+
+describe('unsubscribeCreateOrders()', () => {
+  it('should unsubscribe when success', () => {
+    const handler = createHandler()
+    handler.createOrderListeners = [jest.fn(), jest.fn(), jest.fn()]
+
+    unsubscribeCreateOrders(handler, 1)
+
+    expect(handler.createOrderListeners[0]).toBeDefined()
+    expect(handler.createOrderListeners[1]).toBeNull()
+    expect(handler.createOrderListeners[2]).toBeDefined()
+    expect(offMock).toBeCalledTimes(1)
+    expect(offMock.mock.calls[0][0]).toBe('CreateOrder')
+    expect(offMock.mock.calls[0][1]).toBeDefined()
+  })
+
+  it('should do nothing when unknown ID', () => {
+    const handler = createHandler()
+    handler.createOrderListeners = [jest.fn(), jest.fn(), jest.fn()]
+
+    unsubscribeCreateOrders(handler, 4)
+
+    expect(handler.createOrderListeners[0]).toBeDefined()
+    expect(handler.createOrderListeners[1]).toBeDefined()
+    expect(handler.createOrderListeners[2]).toBeDefined()
+    expect(offMock).toBeCalledTimes(0)
+  })
+
+  it('should do nothing when unsubscribed', () => {
+    const handler = createHandler()
+    handler.createOrderListeners = [jest.fn(), null, jest.fn()]
+
+    unsubscribeCreateOrders(handler, 1)
+
+    expect(handler.createOrderListeners[0]).toBeDefined()
+    expect(handler.createOrderListeners[1]).toBeNull()
+    expect(handler.createOrderListeners[2]).toBeDefined()
+    expect(offMock).toBeCalledTimes(0)
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    handler.createOrderListeners = [jest.fn(), jest.fn(), jest.fn()]
+
+    offMock.mockImplementation(() => {
+      throw new Error('error')
+    })
+
+    expect(() => unsubscribeCreateOrders(handler, 1)).toThrow('error')
+  })
+})
+
+describe('subscribeCancelOrders()', () => {
+  it('should subscribe when success', () => {
+    const handler = createHandler()
+    handler.cancelOrderListeners = [jest.fn(), jest.fn()]
+    const callback = jest.fn()
+    const orderId = BigNumber.from(1)
+
+    const id = subscribeCancelOrders(handler, callback)
+
+    expect(id).toBe(2)
+    expect(handler.cancelOrderListeners).toHaveLength(3)
+    expect(onMock).toBeCalledTimes(1)
+    expect(onMock.mock.calls[0][0]).toBe('CancelOrder')
+    const onCallback = onMock.mock.calls[0][1]
+    expect(onCallback).toBeDefined()
+
+    onCallback(orderId)
+
+    expect(callback).toBeCalledTimes(1)
+    expect(callback.mock.calls[0][0]).toEqual(orderId)
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    const callback = jest.fn()
+    onMock.mockImplementationOnce(() => {
+      throw new Error('error')
+    })
+
+    expect(() => subscribeCancelOrders(handler, callback)).toThrow('error')
+
+    expect(onMock).toBeCalledTimes(1)
+  })
+})
+
+describe('unsubscribeCancelOrders()', () => {
+  it('should unsubscribe when success', () => {
+    const handler = createHandler()
+    handler.cancelOrderListeners = [jest.fn(), jest.fn(), jest.fn()]
+
+    unsubscribeCancelOrders(handler, 1)
+
+    expect(handler.cancelOrderListeners[0]).toBeDefined()
+    expect(handler.cancelOrderListeners[1]).toBeNull()
+    expect(handler.cancelOrderListeners[2]).toBeDefined()
+    expect(offMock).toBeCalledTimes(1)
+    expect(offMock.mock.calls[0][0]).toBe('CancelOrder')
+    expect(offMock.mock.calls[0][1]).toBeDefined()
+  })
+
+  it('should do nothing when unknown ID', () => {
+    const handler = createHandler()
+    handler.cancelOrderListeners = [jest.fn(), jest.fn(), jest.fn()]
+
+    unsubscribeCreateOrders(handler, 4)
+
+    expect(handler.cancelOrderListeners[0]).toBeDefined()
+    expect(handler.cancelOrderListeners[1]).toBeDefined()
+    expect(handler.cancelOrderListeners[2]).toBeDefined()
+    expect(offMock).toBeCalledTimes(0)
+  })
+
+  it('should do nothing when unsubscribed', () => {
+    const handler = createHandler()
+    handler.cancelOrderListeners = [jest.fn(), null, jest.fn()]
+
+    unsubscribeCreateOrders(handler, 1)
+
+    expect(handler.cancelOrderListeners[0]).toBeDefined()
+    expect(handler.cancelOrderListeners[1]).toBeNull()
+    expect(handler.cancelOrderListeners[2]).toBeDefined()
+    expect(offMock).toBeCalledTimes(0)
+  })
+
+  it('should throw when error', () => {
+    const handler = createHandler()
+    handler.cancelOrderListeners = [jest.fn(), jest.fn(), jest.fn()]
+
+    offMock.mockImplementation(() => {
+      throw new Error('error')
+    })
+
+    expect(() => unsubscribeCancelOrders(handler, 1)).toThrow('error')
+  })
+})
+
 describe('getAllTrades()', () => {
   it('should return trades when success', async () => {
     const sellAccount = '0xA'
@@ -346,6 +541,159 @@ describe('getAllTrades()', () => {
     queryFilterMock.mockRejectedValueOnce('error')
 
     expect(getAllTrades(handler)).rejects.toBe('error')
+
+    expect(queryFilterMock).toBeCalledTimes(1)
+  })
+})
+
+describe('getPendingOrders()', () => {
+  it('should return pending orders when success', async () => {
+    const account = '0xA'
+    const ethToken = ETHER_ADDRESS
+    const ethAmount = parseEther('1')
+    const tokenToken = '0x1'
+    const tokenAmount = parseEther('1000')
+    const events = [
+      {
+        args: {
+          id: BigNumber.from('1'),
+          account,
+          sellToken: ethToken,
+          sellAmount: ethAmount,
+          buyToken: tokenToken,
+          buyAmount: tokenAmount,
+          timestamp,
+        },
+      },
+      {
+        args: {
+          id: BigNumber.from('2'),
+          account,
+          sellToken: tokenToken,
+          sellAmount: tokenAmount,
+          buyToken: ethToken,
+          buyAmount: ethAmount,
+          timestamp: timestamp.add(1000),
+        },
+      },
+      {
+        args: {
+          id: BigNumber.from('3'),
+          account,
+          sellToken: tokenToken,
+          sellAmount: tokenAmount,
+          buyToken: ethToken,
+          buyAmount: ethAmount,
+          timestamp: timestamp.add(2000),
+        },
+      },
+      {
+        args: {
+          id: BigNumber.from('4'),
+          account,
+          sellToken: tokenToken,
+          sellAmount: tokenAmount,
+          buyToken: ethToken,
+          buyAmount: ethAmount,
+          timestamp: timestamp.add(3000),
+        },
+      },
+    ]
+    const handler = createHandler()
+    CreateOrderMock.mockReturnValueOnce('CreateOrder')
+    CancelOrderMock.mockReturnValueOnce('CancelOrder')
+    TradeMock.mockReturnValueOnce('Trade')
+    queryFilterMock.mockImplementation((event: string) => {
+      switch (event) {
+        case 'CreateOrder':
+          return Promise.resolve(events)
+        case 'CancelOrder':
+          return Promise.resolve([{ args: { ...events[2].args, orderId: BigNumber.from('3') } }])
+        case 'Trade':
+          return Promise.resolve([{ args: { ...events[1].args, orderId: BigNumber.from('2') } }])
+        default:
+          return Promise.resolve([])
+      }
+    })
+
+    const orders = await getPendingOrders(handler)
+
+    expect(orders).toEqual([
+      {
+        orderId: '4',
+        timestamp: new Date(timestamp.add(3000).mul(1000).toNumber()),
+        type: TradeType.Sell,
+        account,
+        amount: tokenAmount.toString(),
+        unitPrice: parseEther('0.001').toString(),
+        totalPrice: ethAmount.toString(),
+      },
+      {
+        orderId: '1',
+        timestamp: new Date(timestamp.mul(1000).toNumber()),
+        type: TradeType.Buy,
+        account,
+        amount: tokenAmount.toString(),
+        unitPrice: parseEther('0.001').toString(),
+        totalPrice: ethAmount.toString(),
+      },
+    ])
+    expect(CreateOrderMock).toBeCalledTimes(1)
+    expect(CancelOrderMock).toBeCalledTimes(1)
+    expect(TradeMock).toBeCalledTimes(1)
+    expect(queryFilterMock).toBeCalledTimes(3)
+  })
+
+  it('should return limited orders', async () => {
+    const ethToken = ETHER_ADDRESS
+    const ethAmount = parseEther('1')
+    const account = '0xB'
+    const tokenToken = '0x1'
+    const tokenAmount = parseEther('1000')
+    const createOrder = (id: number, timestamp: BigNumber) => {
+      return {
+        args: {
+          id: BigNumber.from(id),
+          account,
+          sellToken: ethToken,
+          sellAmount: ethAmount,
+          buyToken: tokenToken,
+          buyAmount: tokenAmount,
+          timestamp,
+        },
+      }
+    }
+    const events = [] as unknown[]
+    for (let index = 1; index <= 30; index++) {
+      events.push(createOrder(index, BigNumber.from(timestamp.toNumber() + index * 10000)))
+    }
+    const handler = createHandler()
+    CreateOrderMock.mockReturnValueOnce('CreateOrder')
+    queryFilterMock.mockImplementation((event: string) => {
+      switch (event) {
+        case 'CreateOrder':
+          return Promise.resolve(events)
+        default:
+          return Promise.resolve([])
+      }
+    })
+
+    const orders = await getPendingOrders(handler)
+
+    expect(orders).toHaveLength(20)
+    expect(orders[0].orderId).toBe('30')
+    expect(orders[19].orderId).toBe('11')
+    expect(CreateOrderMock).toBeCalledTimes(1)
+    expect(CancelOrderMock).toBeCalledTimes(1)
+    expect(TradeMock).toBeCalledTimes(1)
+    expect(queryFilterMock).toBeCalledTimes(3)
+  })
+
+  it('should reject when error', () => {
+    const handler = createHandler()
+    queryFilterMock.mockRejectedValueOnce('error')
+
+    expect(getPendingOrders(handler)).rejects.toBe('error')
 
     expect(queryFilterMock).toBeCalledTimes(1)
   })

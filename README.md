@@ -32,7 +32,7 @@ yarn install
 Run the client locally in development mode:
 
 ```bash
-yarn server
+yarn start
 ```
 
 The application will be available from `http://localhost:3000` by default.
@@ -59,6 +59,8 @@ This project is not currently open to contributions.
 , [React](https://reactjs.org)
 , [Eslint](https://eslint.org)
 , [Prettier](https://prettier.io)
+, [Commitizen](https://github.com/commitizen/cz-cli)
+, [commitLint](https://commitlint.js.org/#/)
 , [Jest](https://jestjs.io)
 , [styled-components](https://styled-components.com)
 , [Ethers](https://docs.ethers.io/)

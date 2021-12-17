@@ -5,11 +5,10 @@ import { Spacers } from 'styles/sizes'
 export const MainContainer = styled(Container)`
   display: grid;
   grid-template-columns: auto auto auto min-content;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   grid-template-areas:
-    'deposit-withdraw . . trade-history'
-    '.                . . trade-history'
-    '.                . . trade-history';
+    'deposit-withdraw sell-orders . trade-history'
+    '.                buy-orders . trade-history';
   column-gap: ${Spacers.m};
   row-gap: ${Spacers.m};
   padding: ${Spacers.m};

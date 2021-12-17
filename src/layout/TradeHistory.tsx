@@ -4,7 +4,7 @@ import { printAmount } from 'libraries/helpers'
 import { ExchangeContext } from './ExchangeContext'
 import Table from 'react-bootstrap/Table'
 import StyledTradeHistory from './TradeHistory.style'
-import { TradeType } from 'libraries/contracts/exchange'
+import { TradeType } from 'models/Trade'
 
 const TradeHistory: FC = () => {
   const { trades } = useContext(ExchangeContext)
