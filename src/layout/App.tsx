@@ -9,6 +9,7 @@ import MetaMaskModal from './MetaMaskModal'
 import { initializeContract } from 'libraries/contracts/token'
 import DepositWithdraw from './DepositWithdraw'
 import TradeHistory from './TradeHistory'
+import Orders from './Orders'
 import StyledApp, { MainContainer } from './App.style'
 
 const App: FC = () => {
@@ -64,6 +65,7 @@ const App: FC = () => {
             {initialized && (
               <>
                 <DepositWithdraw />
+                <Orders />
                 <TradeHistory />
               </>
             )}

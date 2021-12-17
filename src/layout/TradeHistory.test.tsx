@@ -3,9 +3,9 @@ import TradeHistory from './TradeHistory'
 import renderer from 'react-test-renderer'
 import { BigNumber } from 'ethers'
 import { parseEther } from 'ethers/lib/utils'
-import { TradeType } from '../libraries/contracts/exchange'
 import { InitializationStatus, MetaMaskContext, MetaMaskContextValue } from './MetaMaskContext'
 import { ExchangeContext, ExchangeContextValue } from './ExchangeContext'
+import { TradeType } from 'models/Trade'
 
 const createMetaMaskContextValue = (): MetaMaskContextValue => {
   return {
@@ -28,7 +28,13 @@ const createExchangeContextValue = (): ExchangeContextValue => {
     initialize: jest.fn(),
     setAccount: jest.fn(),
     updateBalances: jest.fn(),
-  }
+    getTokenAllowance: jest.fn(),
+    approveToken: jest.fn(),
+    depositEther: jest.fn(),
+    depositToken: jest.fn(),
+    withdrawEther: jest.fn(),
+    withdrawToken: jest.fn(),
+  } as unknown as ExchangeContextValue
 }
 
 const renderComponent = (metaMaskContextValue: MetaMaskContextValue, exchangeContextValue: ExchangeContextValue) =>

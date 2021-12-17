@@ -1,6 +1,11 @@
 import { createContext, useCallback, useEffect, useRef, useState } from 'react'
 import { Web3Provider } from '@ethersproject/providers'
+import { BigNumber } from 'ethers'
 import { Token } from 'contracts/Token'
+import uniqBy from 'lodash/uniqBy'
+import filter from 'lodash/filter'
+import Trade from 'models/Trade'
+import Order from 'models/Order'
 import {
   approveToken,
   depositEther,
@@ -8,24 +13,28 @@ import {
   ExchangeHandler,
   getAllTrades,
   getEthBalance,
+  getPendingOrders,
   getTokenAllowance,
   getTokenBalance,
   initializeContract,
+  ORDERS_LIMIT,
+  subscribeCancelOrders,
+  subscribeCreateOrders,
   subscribeTrades,
-  Trade,
   TRADES_LIMIT,
+  unsubscribeCancelOrders,
+  unsubscribeCreateOrders,
   unsubscribeTrades,
   withdrawEther,
   withdrawToken,
 } from 'libraries/contracts/exchange'
-import uniqBy from 'lodash/uniqBy'
-import { BigNumber } from 'ethers'
 
 export interface ExchangeContextValue {
   initialized: boolean
   ethBalance: string | undefined
   tokenBalance: string | undefined
   trades: Trade[]
+  orders: Order[]
   initialize: (provider: Web3Provider, token: Token) => Promise<boolean>
   setAccount: (account: string | null | undefined) => void
   updateBalances: () => Promise<void>
@@ -44,25 +53,42 @@ export const useExchangeContext = (): ExchangeContextValue => {
   const [account, setAccount] = useState<string | null | undefined>()
   const [tokenBalance, setTokenBalance] = useState<string | undefined>()
   const [tradeListener, setTradeListener] = useState<number>()
+  const [createOrderListener, setCreateOrderListener] = useState<number>()
+  const [cancelOrderListener, setCancelOrderListener] = useState<number>()
   const [trades, setTrades] = useState<Trade[]>([])
-
-  const addTrade = (trade: Trade) => {
-    setTrades((trades) => uniqBy([trade, ...trades].slice(0, TRADES_LIMIT - 1), 'orderId'))
-  }
+  const [orders, setOrders] = useState<Order[]>([])
 
   const initializeValue = async (provider: Web3Provider, token: Token) => {
     try {
       exchangeHandlerRef.current = initializeContract(provider, token)
       setInitialized(!!exchangeHandlerRef.current)
 
-      setTrades((await getAllTrades(exchangeHandlerRef.current)) || [])
-      const tradeListener = subscribeTrades(exchangeHandlerRef.current, addTrade)
-      setTradeListener(tradeListener)
+      await initializeTrades()
+      await initializeOrders()
       return true
     } catch {
       setInitialized(false)
       return false
     }
+  }
+
+  const initializeTrades = async () => {
+    if (!exchangeHandlerRef.current) {
+      return
+    }
+
+    setTrades((await getAllTrades(exchangeHandlerRef.current)) || [])
+    setTradeListener(subscribeTrades(exchangeHandlerRef.current, addTrade))
+  }
+
+  const initializeOrders = async () => {
+    if (!exchangeHandlerRef.current) {
+      return
+    }
+
+    setOrders((await getPendingOrders(exchangeHandlerRef.current)) || [])
+    setCreateOrderListener(subscribeCreateOrders(exchangeHandlerRef.current, addOrder))
+    setCancelOrderListener(subscribeCancelOrders(exchangeHandlerRef.current, removeOrder))
   }
 
   const setAccountValue = (account: string | null | undefined) => {
@@ -71,12 +97,20 @@ export const useExchangeContext = (): ExchangeContextValue => {
 
   useEffect(() => {
     return () => {
-      if (!exchangeHandlerRef.current || !tradeListener) {
+      if (!exchangeHandlerRef.current) {
         return
       }
-      unsubscribeTrades(exchangeHandlerRef.current, tradeListener)
+      if (tradeListener) {
+        unsubscribeTrades(exchangeHandlerRef.current, tradeListener)
+      }
+      if (createOrderListener) {
+        unsubscribeCreateOrders(exchangeHandlerRef.current, createOrderListener)
+      }
+      if (cancelOrderListener) {
+        unsubscribeCancelOrders(exchangeHandlerRef.current, cancelOrderListener)
+      }
     }
-  }, [tradeListener])
+  }, [cancelOrderListener, createOrderListener, tradeListener])
 
   const updateBalancesValue = useCallback(async () => {
     if (!exchangeHandlerRef.current || !account) {
@@ -144,6 +178,19 @@ export const useExchangeContext = (): ExchangeContextValue => {
     await withdrawToken(exchangeHandlerRef.current, amount)
   }
 
+  const addTrade = (trade: Trade) => {
+    setTrades((trades) => uniqBy([trade, ...trades].slice(0, TRADES_LIMIT - 1), 'orderId'))
+    setOrders((orders) => filter(orders, ({ orderId }) => trade.orderId != orderId))
+  }
+
+  const addOrder = (order: Order) => {
+    setOrders((orders) => uniqBy([order, ...orders].slice(0, ORDERS_LIMIT - 1), 'orderId'))
+  }
+
+  const removeOrder = (id: BigNumber) => {
+    setOrders((orders) => filter(orders, ({ orderId }) => !id.eq(orderId)))
+  }
+
   useEffect(() => {
     updateBalancesValue()
   }, [updateBalancesValue, account])
@@ -153,6 +200,7 @@ export const useExchangeContext = (): ExchangeContextValue => {
     ethBalance,
     tokenBalance,
     trades,
+    orders,
     initialize: initializeValue,
     setAccount: setAccountValue,
     updateBalances: updateBalancesValue,
@@ -170,6 +218,7 @@ export const ExchangeContext = createContext<ExchangeContextValue>({
   ethBalance: undefined,
   tokenBalance: undefined,
   trades: [],
+  orders: [],
   initialize: async () => false,
   setAccount: () => undefined,
   updateBalances: async () => undefined,

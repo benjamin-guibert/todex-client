@@ -4,6 +4,5 @@
     "baseUrl": "./src/",
     "removeComments": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.*", "src/test", "src/**/__mocks__/*"]
+  "include": ["src/**/*"]
 }
