@@ -13,6 +13,7 @@ import {
   depositEther,
   depositToken,
   ExchangeHandler,
+  fillOrder,
   getAllTrades,
   getEthBalance,
   getPendingOrders,
@@ -48,6 +49,7 @@ export interface ExchangeContextValue {
   withdrawToken: (amount: BigNumber) => Promise<void>
   createOrder: (order: Order) => Promise<void>
   cancelOrder: (orderId: string) => Promise<void>
+  fillOrder: (orderId: string) => Promise<void>
 }
 
 export const useExchangeContext = (): ExchangeContextValue => {
@@ -198,6 +200,14 @@ export const useExchangeContext = (): ExchangeContextValue => {
     await cancelOrder(exchangeHandlerRef.current, orderId)
   }
 
+  const fillOrderValue = async (orderId: string) => {
+    if (!exchangeHandlerRef.current) {
+      return
+    }
+
+    await fillOrder(exchangeHandlerRef.current, orderId)
+  }
+
   const addTrade = (trade: Trade) => {
     setTrades((trades) => uniqBy([trade, ...trades], 'orderId').slice(0, TRADES_LIMIT - 1))
     setOrders((orders) => filter(orders, ({ id }) => trade.orderId != id))
@@ -213,7 +223,7 @@ export const useExchangeContext = (): ExchangeContextValue => {
 
   useEffect(() => {
     updateBalancesValue()
-  }, [updateBalancesValue, account])
+  }, [updateBalancesValue, account, orders, trades])
 
   return {
     initialized,
@@ -232,6 +242,7 @@ export const useExchangeContext = (): ExchangeContextValue => {
     withdrawToken: withdrawTokenValue,
     createOrder: createOrderValue,
     cancelOrder: cancelOrderValue,
+    fillOrder: fillOrderValue,
   }
 }
 
@@ -252,4 +263,5 @@ export const ExchangeContext = createContext<ExchangeContextValue>({
   withdrawToken: async () => undefined,
   createOrder: async () => undefined,
   cancelOrder: async () => undefined,
+  fillOrder: async () => undefined,
 })

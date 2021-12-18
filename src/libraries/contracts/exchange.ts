@@ -182,7 +182,10 @@ export const withdrawToken = async ({ token, exchange }: ExchangeHandler, amount
   await exchange.withdrawToken(token.address, amount)
 }
 
-export const createOrder = async ({ token, exchange }: ExchangeHandler, { type, amount, totalPrice }: Order) => {
+export const createOrder = async (
+  { token, exchange }: ExchangeHandler,
+  { type, amount, totalPrice }: Order
+): Promise<void> => {
   if (type === TradeType.Buy) {
     await exchange.createOrder(ETHER_ADDRESS, totalPrice, token.address, amount)
   } else {
@@ -190,8 +193,12 @@ export const createOrder = async ({ token, exchange }: ExchangeHandler, { type, 
   }
 }
 
-export const cancelOrder = async ({ exchange }: ExchangeHandler, orderId: string) => {
+export const cancelOrder = async ({ exchange }: ExchangeHandler, orderId: string): Promise<void> => {
   await exchange.cancelOrder(orderId)
+}
+
+export const fillOrder = async ({ exchange }: ExchangeHandler, orderId: string): Promise<void> => {
+  await exchange.fillOrder(orderId)
 }
 
 const getTradeFromTradeEvent = ({

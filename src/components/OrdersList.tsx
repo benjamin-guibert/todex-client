@@ -9,7 +9,7 @@ interface OrdersListProps {
   orders: Order[]
   variant?: 'success' | 'danger'
   className?: string
-  actions?: FC<{ orderId: string }>[]
+  actions?: FC<{ order: Order }>[]
   styleType?: boolean
 }
 
@@ -26,7 +26,9 @@ const OrdersList: FC<OrdersListProps> = ({ variant, className, orders, actions, 
           </tr>
         </thead>
         <tbody>
-          {orders.map(({ id, type, amount, unitPrice, totalPrice }) => {
+          {orders.map((order) => {
+            const { id, type, amount, unitPrice, totalPrice } = order
+
             return (
               <tr
                 className={[
@@ -41,7 +43,7 @@ const OrdersList: FC<OrdersListProps> = ({ variant, className, orders, actions, 
                 {!!actions?.length && (
                   <td>
                     {actions.map((Action, i) => (
-                      <Action key={`id-${i}`} orderId={id as string} />
+                      <Action key={`id-${i}`} order={order} />
                     ))}
                   </td>
                 )}

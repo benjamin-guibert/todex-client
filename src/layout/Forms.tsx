@@ -34,9 +34,9 @@ const Forms: FC = () => {
     return !!allowance?.gte(amount)
   }
 
-  const DeleteButton: FC<{ orderId: string }> = ({ orderId }) => {
+  const DeleteButton: FC<{ order: Order }> = ({ order }) => {
     return (
-      <Button variant="outline-secondary" size="sm" onClick={() => cancelOrder(orderId)}>
+      <Button variant="outline-secondary" size="sm" onClick={() => cancelOrder(order.id as string)}>
         Cancel
       </Button>
     )

@@ -11,6 +11,7 @@ import {
   depositEther,
   depositToken,
   ExchangeHandler,
+  fillOrder,
   getAllTrades,
   getEthBalance,
   getPendingOrders,
@@ -58,6 +59,7 @@ const withdrawEtherMock = jest.fn()
 const withdrawTokenMock = jest.fn()
 const createOrderMock = jest.fn()
 const cancelOrderMock = jest.fn()
+const fillOrderMock = jest.fn()
 const exchange = {
   address: EXCHANGE_ADDRESS,
   ethBalanceOf: ethBalanceOfMock,
@@ -76,6 +78,7 @@ const exchange = {
   withdrawToken: withdrawTokenMock,
   createOrder: createOrderMock,
   cancelOrder: cancelOrderMock,
+  fillOrder: fillOrderMock,
 } as unknown as Exchange
 
 const createHandler = (): ExchangeHandler => {
@@ -928,5 +931,23 @@ describe('cancelOrder()', () => {
     const handler = createHandler()
 
     expect(cancelOrder(handler, '1')).rejects.toEqual('error')
+  })
+})
+
+describe('fillOrder()', () => {
+  it('should fill order when success', () => {
+    const handler = createHandler()
+
+    fillOrder(handler, '1')
+
+    expect(fillOrderMock).toBeCalledTimes(1)
+    expect(fillOrderMock.mock.calls[0][0]).toEqual('1')
+  })
+
+  it('should throw error when error', () => {
+    fillOrderMock.mockRejectedValue('error')
+    const handler = createHandler()
+
+    expect(fillOrder(handler, '1')).rejects.toEqual('error')
   })
 })

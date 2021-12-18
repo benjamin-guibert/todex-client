@@ -5,10 +5,13 @@ import { ExchangeContext } from './ExchangeContext'
 import { BuyOrdersList, SellOrdersList } from './Orders.style'
 import { TradeType } from 'models/Trade'
 import { MetaMaskContext } from './MetaMaskContext'
+import Button from 'react-bootstrap/esm/Button'
+import Order from 'models/Order'
+import { BigNumber } from 'ethers'
 
 const Orders: FC = () => {
   const { account } = useContext(MetaMaskContext)
-  const { orders } = useContext(ExchangeContext)
+  const { orders, ethBalance, tokenBalance, fillOrder } = useContext(ExchangeContext)
   const sellOrder = orderBy(
     filter(orders, ({ type, account: orderAccount }) => type == TradeType.Sell && orderAccount !== account),
     ['unitPrice'],
@@ -20,10 +23,40 @@ const Orders: FC = () => {
     ['desc']
   )
 
+  const BuyButton: FC<{ order: Order }> = ({ order }) => {
+    const { id, totalPrice } = order
+
+    return (
+      <Button
+        size="sm"
+        variant="danger"
+        disabled={!ethBalance || BigNumber.from(totalPrice).gte(BigNumber.from(ethBalance))}
+        onClick={() => fillOrder(id as string)}
+      >
+        Buy
+      </Button>
+    )
+  }
+
+  const SellButton: FC<{ order: Order }> = ({ order }) => {
+    const { id, amount } = order
+
+    return (
+      <Button
+        size="sm"
+        variant="success"
+        disabled={!tokenBalance || BigNumber.from(amount).gte(BigNumber.from(tokenBalance))}
+        onClick={() => fillOrder(id as string)}
+      >
+        Sell
+      </Button>
+    )
+  }
+
   return (
     <>
-      <SellOrdersList orders={sellOrder} variant="danger" />
-      <BuyOrdersList orders={buyOrder} variant="success" />
+      <SellOrdersList orders={sellOrder} variant="danger" actions={[BuyButton]} />
+      <BuyOrdersList orders={buyOrder} variant="success" actions={[SellButton]} />
     </>
   )
 }
