@@ -7,6 +7,8 @@ export default interface Trade {
   orderId: string
   timestamp: Date
   type: TradeType
+  sellAccount: string
+  buyAccount: string
   amount: string
   unitPrice: string
   totalPrice: string

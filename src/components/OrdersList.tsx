@@ -1,8 +1,9 @@
-import React, { FC } from 'react'
+import React, { FC, useContext } from 'react'
 import { printAmount } from 'libraries/helpers'
 import Order from 'models/Order'
 import Container from 'react-bootstrap/Container'
 import Table from 'react-bootstrap/Table'
+import { MetaMaskContext } from 'layout/MetaMaskContext'
 
 interface OrdersListProps {
   variant: 'success' | 'danger'
@@ -11,6 +12,8 @@ interface OrdersListProps {
 }
 
 const OrdersList: FC<OrdersListProps> = ({ variant, className, orders }) => {
+  const { account: userAccount } = useContext(MetaMaskContext)
+
   return (
     <Container className={className}>
       <Table variant={variant}>
@@ -22,11 +25,11 @@ const OrdersList: FC<OrdersListProps> = ({ variant, className, orders }) => {
           </tr>
         </thead>
         <tbody>
-          {orders.map(({ orderId, amount, unitPrice, totalPrice }) => {
+          {orders.map(({ id, account, amount, unitPrice, totalPrice }) => {
             return (
-              <tr className="font-monospace text-end" key={orderId}>
+              <tr className={['font-monospace text-end', account === userAccount ? 'fw-bold' : ''].join(' ')} key={id}>
                 <td>{printAmount(amount)}</td>
-                <td>{printAmount(unitPrice)}</td>
+                <td>{printAmount(unitPrice as string)}</td>
                 <td>{printAmount(totalPrice)}</td>
               </tr>
             )

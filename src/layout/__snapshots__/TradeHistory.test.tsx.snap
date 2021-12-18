@@ -2,7 +2,7 @@
 
 exports[`<TradeHistory /> should render when no trades 1`] = `
 <div
-  className="sc-bdvvtL iytLv container"
+  className="sc-bdvvtL bhSlti container"
 >
   <table
     className="table table-dark"
@@ -32,7 +32,7 @@ exports[`<TradeHistory /> should render when no trades 1`] = `
 
 exports[`<TradeHistory /> should render when trades 1`] = `
 <div
-  className="sc-bdvvtL iytLv container"
+  className="sc-bdvvtL bhSlti container"
 >
   <table
     className="table table-dark"
@@ -57,7 +57,7 @@ exports[`<TradeHistory /> should render when trades 1`] = `
     </thead>
     <tbody>
       <tr
-        className="font-monospace text-success"
+        className="font-monospace text-success fw-bold"
       >
         <td
           className="text-center text-muted"
@@ -81,7 +81,7 @@ exports[`<TradeHistory /> should render when trades 1`] = `
         </td>
       </tr>
       <tr
-        className="font-monospace text-danger"
+        className="font-monospace text-danger fw-bold"
       >
         <td
           className="text-center text-muted"

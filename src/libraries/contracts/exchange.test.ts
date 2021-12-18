@@ -2,10 +2,11 @@ import { Web3Provider } from '@ethersproject/providers'
 import { Token } from 'contracts/Token'
 import { Exchange } from 'contracts/Exchange'
 import { BigNumber } from '@ethersproject/bignumber'
-import { parseEther } from 'ethers/lib/utils'
+import { parseEther, parseUnits } from 'ethers/lib/utils'
 import { BURN_ADDRESS } from './helpers'
 import {
   approveToken,
+  createOrder,
   depositEther,
   depositToken,
   ExchangeHandler,
@@ -25,6 +26,7 @@ import {
   withdrawToken,
 } from './exchange'
 import { TradeType } from 'models/Trade'
+import Order from 'models/Order'
 
 const ETHER_ADDRESS = BURN_ADDRESS
 const TOKEN_ADDRESS = '0x1'
@@ -53,6 +55,7 @@ const depositEtherMock = jest.fn()
 const depositTokenMock = jest.fn()
 const withdrawEtherMock = jest.fn()
 const withdrawTokenMock = jest.fn()
+const createOrderMock = jest.fn()
 const exchange = {
   address: EXCHANGE_ADDRESS,
   ethBalanceOf: ethBalanceOfMock,
@@ -69,6 +72,7 @@ const exchange = {
   depositToken: depositTokenMock,
   withdrawEther: withdrawEtherMock,
   withdrawToken: withdrawTokenMock,
+  createOrder: createOrderMock,
 } as unknown as Exchange
 
 const createHandler = (): ExchangeHandler => {
@@ -184,6 +188,8 @@ describe('subscribeTrades()', () => {
       orderId: '1',
       timestamp: new Date(timestamp.mul(1000).toNumber()),
       type: TradeType.Buy,
+      sellAccount,
+      buyAccount,
       amount: buyAmount.toString(),
       unitPrice: parseEther('0.001').toString(),
       totalPrice: sellAmount.toString(),
@@ -278,7 +284,7 @@ describe('subscribeCreateOrders()', () => {
 
     expect(callback).toBeCalledTimes(1)
     expect(callback.mock.calls[0][0]).toEqual({
-      orderId: '1',
+      id: '1',
       account,
       timestamp: new Date(timestamp.mul(1000).toNumber()),
       type: TradeType.Buy,
@@ -482,6 +488,8 @@ describe('getAllTrades()', () => {
         orderId: '2',
         timestamp: new Date(timestamp.add(1000).mul(1000).toNumber()),
         type: TradeType.Sell,
+        sellAccount,
+        buyAccount,
         amount: tokenAmount.toString(),
         unitPrice: parseEther('0.001').toString(),
         totalPrice: ethAmount.toString(),
@@ -490,6 +498,8 @@ describe('getAllTrades()', () => {
         orderId: '1',
         timestamp: new Date(timestamp.mul(1000).toNumber()),
         type: TradeType.Buy,
+        sellAccount,
+        buyAccount,
         amount: tokenAmount.toString(),
         unitPrice: parseEther('0.001').toString(),
         totalPrice: ethAmount.toString(),
@@ -620,7 +630,7 @@ describe('getPendingOrders()', () => {
 
     expect(orders).toEqual([
       {
-        orderId: '4',
+        id: '4',
         timestamp: new Date(timestamp.add(3000).mul(1000).toNumber()),
         type: TradeType.Sell,
         account,
@@ -629,7 +639,7 @@ describe('getPendingOrders()', () => {
         totalPrice: ethAmount.toString(),
       },
       {
-        orderId: '1',
+        id: '1',
         timestamp: new Date(timestamp.mul(1000).toNumber()),
         type: TradeType.Buy,
         account,
@@ -681,8 +691,8 @@ describe('getPendingOrders()', () => {
     const orders = await getPendingOrders(handler)
 
     expect(orders).toHaveLength(20)
-    expect(orders[0].orderId).toBe('30')
-    expect(orders[19].orderId).toBe('11')
+    expect(orders[0].id).toBe('30')
+    expect(orders[19].id).toBe('11')
     expect(CreateOrderMock).toBeCalledTimes(1)
     expect(CancelOrderMock).toBeCalledTimes(1)
     expect(TradeMock).toBeCalledTimes(1)
@@ -829,5 +839,73 @@ describe('withdrawToken()', () => {
 
     expect(withdrawToken(handler, amount)).rejects.toBe('error')
     expect(withdrawTokenMock).toBeCalledTimes(1)
+  })
+})
+
+describe('createOrder()', () => {
+  describe('when buy', () => {
+    const order: Order = {
+      id: '1',
+      type: TradeType.Buy,
+      account: '0x1',
+      amount: parseUnits('100').toString(),
+      unitPrice: parseEther('0.01').toString(),
+      totalPrice: parseEther('1').toString(),
+      timestamp: new Date(timestamp.toString()),
+    }
+
+    it('should create order when success', () => {
+      const handler = createHandler()
+
+      createOrder(handler, order)
+
+      expect(createOrderMock).toBeCalledTimes(1)
+      expect(createOrderMock.mock.calls[0][0]).toEqual(ETHER_ADDRESS)
+      expect(createOrderMock.mock.calls[0][1]).toEqual(order.totalPrice)
+      expect(createOrderMock.mock.calls[0][2]).toEqual(TOKEN_ADDRESS)
+      expect(createOrderMock.mock.calls[0][3]).toEqual(order.amount)
+    })
+
+    it('should throw error when error', () => {
+      createOrderMock.mockRejectedValue('error')
+      const handler = createHandler()
+
+      expect(createOrder(handler, order)).rejects.toEqual('error')
+
+      expect(createOrderMock).toBeCalledTimes(1)
+    })
+  })
+
+  describe('when sell', () => {
+    const order: Order = {
+      id: '1',
+      type: TradeType.Sell,
+      account: '0x1',
+      amount: parseUnits('100').toString(),
+      unitPrice: parseEther('0.01').toString(),
+      totalPrice: parseEther('1').toString(),
+      timestamp: new Date(timestamp.toString()),
+    }
+
+    it('should create order when success', () => {
+      const handler = createHandler()
+
+      createOrder(handler, order)
+
+      expect(createOrderMock).toBeCalledTimes(1)
+      expect(createOrderMock.mock.calls[0][0]).toEqual(TOKEN_ADDRESS)
+      expect(createOrderMock.mock.calls[0][1]).toEqual(order.amount)
+      expect(createOrderMock.mock.calls[0][2]).toEqual(ETHER_ADDRESS)
+      expect(createOrderMock.mock.calls[0][3]).toEqual(order.totalPrice)
+    })
+
+    it('should throw error when error', () => {
+      createOrderMock.mockRejectedValue('error')
+      const handler = createHandler()
+
+      expect(createOrder(handler, order)).rejects.toEqual('error')
+
+      expect(createOrderMock).toBeCalledTimes(1)
+    })
   })
 })

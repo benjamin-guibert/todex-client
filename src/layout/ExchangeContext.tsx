@@ -8,6 +8,7 @@ import Trade from 'models/Trade'
 import Order from 'models/Order'
 import {
   approveToken,
+  createOrder,
   depositEther,
   depositToken,
   ExchangeHandler,
@@ -44,6 +45,7 @@ export interface ExchangeContextValue {
   depositToken: (amount: BigNumber) => Promise<void>
   withdrawEther: (amount: BigNumber) => Promise<void>
   withdrawToken: (amount: BigNumber) => Promise<void>
+  createOrder: (order: Order) => Promise<void>
 }
 
 export const useExchangeContext = (): ExchangeContextValue => {
@@ -178,17 +180,25 @@ export const useExchangeContext = (): ExchangeContextValue => {
     await withdrawToken(exchangeHandlerRef.current, amount)
   }
 
+  const createOrderValue = async (order: Order) => {
+    if (!exchangeHandlerRef.current) {
+      return
+    }
+
+    await createOrder(exchangeHandlerRef.current, order)
+  }
+
   const addTrade = (trade: Trade) => {
-    setTrades((trades) => uniqBy([trade, ...trades].slice(0, TRADES_LIMIT - 1), 'orderId'))
-    setOrders((orders) => filter(orders, ({ orderId }) => trade.orderId != orderId))
+    setTrades((trades) => uniqBy([trade, ...trades], 'orderId').slice(0, TRADES_LIMIT - 1))
+    setOrders((orders) => filter(orders, ({ id }) => trade.orderId != id))
   }
 
   const addOrder = (order: Order) => {
-    setOrders((orders) => uniqBy([order, ...orders].slice(0, ORDERS_LIMIT - 1), 'orderId'))
+    setOrders((orders) => uniqBy([order, ...orders], 'id').slice(0, ORDERS_LIMIT - 1))
   }
 
   const removeOrder = (id: BigNumber) => {
-    setOrders((orders) => filter(orders, ({ orderId }) => !id.eq(orderId)))
+    setOrders((orders) => filter(orders, ({ id: orderId }) => !id.eq(orderId as string)))
   }
 
   useEffect(() => {
@@ -210,6 +220,7 @@ export const useExchangeContext = (): ExchangeContextValue => {
     depositToken: depositTokenValue,
     withdrawEther: withdrawEtherValue,
     withdrawToken: withdrawTokenValue,
+    createOrder: createOrderValue,
   }
 }
 
@@ -228,4 +239,5 @@ export const ExchangeContext = createContext<ExchangeContextValue>({
   depositToken: async () => undefined,
   withdrawEther: async () => undefined,
   withdrawToken: async () => undefined,
+  createOrder: async () => undefined,
 })
