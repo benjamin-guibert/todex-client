@@ -1,10 +1,10 @@
 import styled from 'styled-components'
 import Container from 'react-bootstrap/Container'
 
-const StyledTradeHistory = styled(Container)`
-  grid-area: trade-history;
+const StyledForms = styled(Container)`
+  grid-area: forms;
   height: 100%;
   overflow: hidden;
 `
 
-export default StyledTradeHistory
+export default StyledForms

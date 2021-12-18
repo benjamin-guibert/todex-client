@@ -1,13 +1,13 @@
 import React, { FC, useContext } from 'react'
-import { ExchangeContext } from './ExchangeContext'
-import StyledDepositWithdraw from './DepositWithdraw.style'
 import DepositWithdrawInput from 'components/DepositWithdrawInput'
-import { BigNumber } from 'ethers'
-import { constants } from 'ethers'
+import { BigNumber, constants } from 'ethers'
+import { ExchangeContext } from './ExchangeContext'
+import StyledForms from './Forms.style'
+import OrderForm from 'components/OrderForm'
 
 const { Zero } = constants
 
-const DepositWithdraw: FC = () => {
+const Forms: FC = () => {
   const {
     depositEther,
     depositToken,
@@ -26,7 +26,7 @@ const DepositWithdraw: FC = () => {
   }
 
   return (
-    <StyledDepositWithdraw>
+    <StyledForms>
       <DepositWithdrawInput
         name="ETH"
         onDeposit={depositEther}
@@ -41,8 +41,9 @@ const DepositWithdraw: FC = () => {
         onWithdraw={withdrawToken}
         onApprove={approveToken}
       />
-    </StyledDepositWithdraw>
+      <OrderForm />
+    </StyledForms>
   )
 }
 
-export default DepositWithdraw
+export default Forms

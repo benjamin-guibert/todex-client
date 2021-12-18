@@ -51,15 +51,15 @@ export const subscribeTrades = (
 ): number => {
   const listener = (
     orderId: BigNumber,
-    _sellAccount: string,
+    sellAccount: string,
     _sellToken: string,
     sellAmount: BigNumber,
-    _buyAccount: string,
+    buyAccount: string,
     buyToken: string,
     buyAmount: BigNumber,
     timestamp: BigNumber
   ) => {
-    callback(getTradeFromTradeEvent({ orderId, sellAmount, buyToken, buyAmount, timestamp }))
+    callback(getTradeFromTradeEvent({ orderId, sellAccount, sellAmount, buyAccount, buyToken, buyAmount, timestamp }))
   }
 
   exchange.on('Trade', listener)
@@ -182,28 +182,42 @@ export const withdrawToken = async ({ token, exchange }: ExchangeHandler, amount
   await exchange.withdrawToken(token.address, amount)
 }
 
+export const createOrder = async ({ token, exchange }: ExchangeHandler, { type, amount, totalPrice }: Order) => {
+  if (type === TradeType.Buy) {
+    await exchange.createOrder(ETHER_ADDRESS, totalPrice, token.address, amount)
+  } else {
+    await exchange.createOrder(token.address, amount, ETHER_ADDRESS, totalPrice)
+  }
+}
+
 const getTradeFromTradeEvent = ({
   orderId,
+  sellAccount,
   sellAmount,
+  buyAccount,
   buyToken,
   buyAmount,
   timestamp,
 }: {
   orderId: BigNumber
+  sellAccount: string
   sellAmount: BigNumber
+  buyAccount: string
   buyToken: string
   buyAmount: BigNumber
   timestamp: BigNumber
 }): Trade => {
   const type = getTradeType(buyToken)
-  const totalPrice = type == TradeType.Buy ? sellAmount : buyAmount // 0.001
-  const tokenAmount = type == TradeType.Buy ? buyAmount : sellAmount // 0.1
+  const totalPrice = type == TradeType.Buy ? sellAmount : buyAmount
+  const tokenAmount = type == TradeType.Buy ? buyAmount : sellAmount
   const unitPrice = tokenAmount.isZero() ? Zero : totalPrice.mul(BigNumber.from(10).pow(DECIMALS)).div(tokenAmount)
 
   return {
     orderId: orderId.toString(),
     timestamp: getDateFromUnixTimestamp(timestamp),
     type,
+    buyAccount,
+    sellAccount,
     amount: tokenAmount.toString(),
     unitPrice: unitPrice.toString(),
     totalPrice: totalPrice.toString(),
@@ -226,12 +240,12 @@ const getOrderFromCreateOrderEvent = ({
   timestamp: BigNumber
 }): Order => {
   const type = getTradeType(buyToken)
-  const totalPrice = type == TradeType.Buy ? sellAmount : buyAmount // 0.001
-  const tokenAmount = type == TradeType.Buy ? buyAmount : sellAmount // 0.1
+  const totalPrice = type == TradeType.Buy ? sellAmount : buyAmount
+  const tokenAmount = type == TradeType.Buy ? buyAmount : sellAmount
   const unitPrice = tokenAmount.isZero() ? Zero : totalPrice.mul(BigNumber.from(10).pow(DECIMALS)).div(tokenAmount)
 
   return {
-    orderId: id.toString(),
+    id: id.toString(),
     timestamp: getDateFromUnixTimestamp(timestamp),
     type,
     account,

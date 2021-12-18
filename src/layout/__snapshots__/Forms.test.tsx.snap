@@ -1,0 +1,223 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Forms /> should render 1`] = `
+<div
+  className="sc-bdvvtL gdVBsa container"
+>
+  <div
+    className="m-3 px-2 py-1 card"
+  >
+    <form
+      className=""
+    >
+      <div
+        className="my-3 row"
+      >
+        <div
+          className="input-group has-validation"
+        >
+          <span
+            className="input-group-text"
+          >
+            ETH
+          </span>
+          <input
+            className="form-control"
+            onChange={[Function]}
+            placeholder="0"
+            type="text"
+            value=""
+          />
+        </div>
+      </div>
+      <div
+        className="my-3 row"
+      >
+        <div
+          className="btn-group"
+          role="group"
+        >
+          <button
+            className="btn btn-primary"
+            disabled={true}
+            onClick={[Function]}
+            type="button"
+          >
+            Deposit
+          </button>
+          <button
+            className="btn btn-primary"
+            disabled={true}
+            onClick={[Function]}
+            type="button"
+          >
+            Withdraw
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div
+    className="m-3 px-2 py-1 card"
+  >
+    <form
+      className=""
+    >
+      <div
+        className="my-3 row"
+      >
+        <div
+          className="input-group has-validation"
+        >
+          <span
+            className="input-group-text"
+          >
+            TDX
+          </span>
+          <input
+            className="form-control"
+            onChange={[Function]}
+            placeholder="0"
+            type="text"
+            value=""
+          />
+        </div>
+      </div>
+      <div
+        className="my-3 row"
+      >
+        <div
+          className="btn-group"
+          role="group"
+        >
+          <button
+            className="btn btn-primary"
+            disabled={true}
+            onClick={[Function]}
+            type="button"
+          >
+            Deposit (Approve)
+          </button>
+          <button
+            className="btn btn-primary"
+            disabled={true}
+            onClick={[Function]}
+            type="button"
+          >
+            Withdraw
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div
+    className="m-3 px-2 py-1 text-dark card"
+  >
+    <form
+      className=""
+    >
+      <div
+        className="my-3 row"
+      >
+        <label
+          className="text-end form-label col-form-label col-sm-3"
+        >
+          Amount:
+        </label>
+        <div
+          className="my-auto col"
+        >
+          <div
+            className="input-group has-validation"
+          >
+            <span
+              className="input-group-text"
+            >
+              TDX
+            </span>
+            <input
+              className="form-control"
+              onChange={[Function]}
+              placeholder="0"
+              type="text"
+              value=""
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="my-3 row"
+      >
+        <label
+          className="text-end form-label col-form-label col-sm-3"
+        >
+          Unit price:
+        </label>
+        <div
+          className="my-auto col"
+        >
+          <div
+            className="input-group has-validation"
+          >
+            <span
+              className="input-group-text"
+            >
+              ETH
+            </span>
+            <input
+              className="form-control"
+              onChange={[Function]}
+              placeholder="0"
+              type="text"
+              value=""
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="my-3 row"
+      >
+        <label
+          className="text-end form-label col-form-label col-sm-3"
+        >
+          Total price:
+        </label>
+        <div
+          className="my-auto col"
+        >
+          <input
+            className="font-monospace form-control-plaintext"
+            defaultValue=""
+            readOnly={true}
+          />
+        </div>
+      </div>
+      <div
+        className="my-3 row"
+      >
+        <div
+          className="btn-group"
+          role="group"
+        >
+          <button
+            className="btn btn-danger"
+            disabled={true}
+            onClick={[Function]}
+            type="button"
+          >
+            Buy
+          </button>
+          <button
+            className="btn btn-success"
+            disabled={true}
+            onClick={[Function]}
+            type="button"
+          >
+            Sell
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+`;

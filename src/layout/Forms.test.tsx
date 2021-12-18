@@ -1,10 +1,10 @@
 import * as React from 'react'
-import DepositWithdraw from './DepositWithdraw'
+import Forms from './Forms'
 import renderer from 'react-test-renderer'
 
-const renderComponent = () => renderer.create(<DepositWithdraw />)
+const renderComponent = () => renderer.create(<Forms />)
 
-describe('<DepositWithdraw />', () => {
+describe('<Forms />', () => {
   it('should render', () => {
     const result = renderComponent()
 

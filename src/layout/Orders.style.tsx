@@ -1,12 +1,14 @@
 import styled from 'styled-components'
-import OrdersList from '../components/OrdersList'
+import OrdersList from 'components/OrdersList'
 
 export const SellOrdersList = styled(OrdersList)`
   grid-area: sell-orders;
   height: 100%;
+  overflow: hidden;
 `
 
 export const BuyOrdersList = styled(OrdersList)`
   grid-area: buy-orders;
   height: 100%;
+  overflow: hidden;
 `

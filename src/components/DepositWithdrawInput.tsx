@@ -7,12 +7,7 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import Button from 'react-bootstrap/Button'
 import { parseEther } from 'ethers/lib/utils'
-
-interface AmountInput {
-  value: string
-  isValid: boolean | undefined
-  invalidMessage: string | undefined
-}
+import { AmountInput } from './types'
 
 interface DepositWithdrawInputProps {
   name: string

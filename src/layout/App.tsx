@@ -7,7 +7,7 @@ import Alert from 'react-bootstrap/Alert'
 import Header from './Header'
 import MetaMaskModal from './MetaMaskModal'
 import { initializeContract } from 'libraries/contracts/token'
-import DepositWithdraw from './DepositWithdraw'
+import Forms from './Forms'
 import TradeHistory from './TradeHistory'
 import Orders from './Orders'
 import StyledApp, { MainContainer } from './App.style'
@@ -64,7 +64,7 @@ const App: FC = () => {
           <MainContainer fluid>
             {initialized && (
               <>
-                <DepositWithdraw />
+                <Forms />
                 <Orders />
                 <TradeHistory />
               </>

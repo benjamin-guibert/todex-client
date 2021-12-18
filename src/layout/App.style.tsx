@@ -4,11 +4,11 @@ import { Spacers } from 'styles/sizes'
 
 export const MainContainer = styled(Container)`
   display: grid;
-  grid-template-columns: auto auto auto min-content;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: 50% 50%;
   grid-template-areas:
-    'deposit-withdraw sell-orders . trade-history'
-    '.                buy-orders . trade-history';
+    'forms sell-orders trade-chart'
+    'forms buy-orders  trade-history';
   column-gap: ${Spacers.m};
   row-gap: ${Spacers.m};
   padding: ${Spacers.m};
