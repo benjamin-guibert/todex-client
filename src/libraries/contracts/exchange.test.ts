@@ -6,6 +6,7 @@ import { parseEther, parseUnits } from 'ethers/lib/utils'
 import { BURN_ADDRESS } from './helpers'
 import {
   approveToken,
+  cancelOrder,
   createOrder,
   depositEther,
   depositToken,
@@ -56,6 +57,7 @@ const depositTokenMock = jest.fn()
 const withdrawEtherMock = jest.fn()
 const withdrawTokenMock = jest.fn()
 const createOrderMock = jest.fn()
+const cancelOrderMock = jest.fn()
 const exchange = {
   address: EXCHANGE_ADDRESS,
   ethBalanceOf: ethBalanceOfMock,
@@ -73,6 +75,7 @@ const exchange = {
   withdrawEther: withdrawEtherMock,
   withdrawToken: withdrawTokenMock,
   createOrder: createOrderMock,
+  cancelOrder: cancelOrderMock,
 } as unknown as Exchange
 
 const createHandler = (): ExchangeHandler => {
@@ -907,5 +910,23 @@ describe('createOrder()', () => {
 
       expect(createOrderMock).toBeCalledTimes(1)
     })
+  })
+})
+
+describe('cancelOrder()', () => {
+  it('should cancel order when success', () => {
+    const handler = createHandler()
+
+    cancelOrder(handler, '1')
+
+    expect(cancelOrderMock).toBeCalledTimes(1)
+    expect(cancelOrderMock.mock.calls[0][0]).toEqual('1')
+  })
+
+  it('should throw error when error', () => {
+    cancelOrderMock.mockRejectedValue('error')
+    const handler = createHandler()
+
+    expect(cancelOrder(handler, '1')).rejects.toEqual('error')
   })
 })

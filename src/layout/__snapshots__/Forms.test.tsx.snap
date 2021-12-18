@@ -122,7 +122,7 @@ exports[`<Forms /> should render 1`] = `
         <label
           className="text-end form-label col-form-label col-sm-3"
         >
-          Amount:
+          Amount
         </label>
         <div
           className="my-auto col"
@@ -151,7 +151,7 @@ exports[`<Forms /> should render 1`] = `
         <label
           className="text-end form-label col-form-label col-sm-3"
         >
-          Unit price:
+          Unit price
         </label>
         <div
           className="my-auto col"

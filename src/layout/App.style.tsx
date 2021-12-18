@@ -4,7 +4,7 @@ import { Spacers } from 'styles/sizes'
 
 export const MainContainer = styled(Container)`
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: 30% 30% auto;
   grid-template-rows: 50% 50%;
   grid-template-areas:
     'forms sell-orders trade-chart'
