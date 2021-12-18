@@ -117,7 +117,7 @@ const OrderForm: FC = () => {
       <Form>
         <Form.Group as={Row} className="my-3">
           <Form.Label column sm={3} className="text-end">
-            Amount:
+            Amount
           </Form.Label>
           <Col className="my-auto">
             <InputGroup hasValidation>
@@ -139,7 +139,7 @@ const OrderForm: FC = () => {
         </Form.Group>
         <Form.Group as={Row} className="my-3">
           <Form.Label column sm={3} className="text-end">
-            Unit price:
+            Unit price
           </Form.Label>
           <Col className="my-auto">
             <InputGroup hasValidation>

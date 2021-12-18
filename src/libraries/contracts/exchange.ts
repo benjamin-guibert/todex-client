@@ -190,6 +190,10 @@ export const createOrder = async ({ token, exchange }: ExchangeHandler, { type, 
   }
 }
 
+export const cancelOrder = async ({ exchange }: ExchangeHandler, orderId: string) => {
+  await exchange.cancelOrder(orderId)
+}
+
 const getTradeFromTradeEvent = ({
   orderId,
   sellAccount,
